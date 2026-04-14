@@ -1,0 +1,1186 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+<title>请查收，一段被宇宙偷偷存档的缘分</title>
+<style>
+/* =========================================================
+   设计变量
+   ========================================================= */
+:root {
+  --deep-space: #04060f;
+  --silver: #ecefff;
+  --silver-dim: rgba(236, 239, 255, 0.78);
+  --mist: rgba(236, 239, 255, 0.48);
+  --warm-gold: #f6d98c;
+  --warm-gold-soft: rgba(246, 217, 140, 0.55);
+  --soft-blue: #a9c4ff;
+  --soft-violet: #c6b3ff;
+
+  /* 手写字体栈：优先华文行楷，回退到常见楷体 */
+  --font-hand: "华文行楷", "STXingkai", "华文楷体", "STKaiti",
+               "楷体", "KaiTi", "Kaiti SC",
+               "Segoe Script", "Lucida Handwriting", serif;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+
+html, body {
+  width: 100%;
+  min-height: 100vh;
+  background: #020308;
+  color: var(--silver);
+  font-family: var(--font-hand);
+  letter-spacing: 0.04em;
+  overflow-x: hidden;
+  scroll-behavior: smooth;
+}
+
+body {
+  background:
+    radial-gradient(ellipse 85% 60% at 50% 20%, #0d1740 0%, #050a1e 48%, #020308 85%);
+}
+
+/* =========================================================
+   背景：星云 + canvas 星场
+   ========================================================= */
+.sky {
+  position: fixed; inset: 0; z-index: 0; overflow: hidden; pointer-events: none;
+}
+.nebula {
+  position: absolute; inset: -10%;
+  background:
+    radial-gradient(ellipse 40% 28% at 18% 22%, rgba(120, 90, 210, 0.18), transparent 60%),
+    radial-gradient(ellipse 42% 30% at 82% 72%, rgba(60, 110, 210, 0.16), transparent 60%),
+    radial-gradient(ellipse 60% 40% at 50% 115%, rgba(220, 170, 110, 0.06), transparent 60%);
+  filter: blur(8px);
+  animation: breathe 14s ease-in-out infinite;
+}
+@keyframes breathe {
+  0%,100% { opacity: 0.7; transform: scale(1); }
+  50%     { opacity: 1;   transform: scale(1.04); }
+}
+#stars-canvas { position: absolute; inset: 0; width: 100%; height: 100%; }
+
+/* =========================================================
+   固定画框舞台（背景）—— 3D 倾斜、朝西北
+   ========================================================= */
+.frame-stage {
+  position: fixed;
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  height: min(74vh, 680px);
+  aspect-ratio: 3 / 4;                 /* 近似礼物图的比例 */
+  z-index: 1;
+  perspective: 2200px;
+  pointer-events: none;
+}
+
+/* 画框本体 —— 实体木框 + 立体倾斜 */
+.frame {
+  position: relative;
+  width: 100%; height: 100%;
+  transform-style: preserve-3d;
+  transform:
+    rotateY(9deg)          /* 正面微微向左 —— 对着"西" */
+    rotateX(-5deg)         /* 上沿微微向前 —— 对着"北" */
+    rotateZ(-1.8deg);      /* 整体略微左倾，增加手作感 */
+  animation: frameSwayBreath 14s ease-in-out infinite;
+  filter: drop-shadow(0 28px 60px rgba(0,0,0,0.75))
+          drop-shadow(0 0 60px rgba(80, 110, 200, 0.14));
+  border-radius: 8px;
+  background:
+    linear-gradient(135deg, #2a2318 0%, #0f0a05 45%, #1e1812 100%);
+  padding: clamp(10px, 1.6vw, 18px);
+}
+@keyframes frameSwayBreath {
+  0%, 100% {
+    transform: rotateY(9deg) rotateX(-5deg) rotateZ(-1.8deg);
+  }
+  50% {
+    transform: rotateY(10.5deg) rotateX(-5.6deg) rotateZ(-2.2deg) translateY(-4px);
+  }
+}
+
+/* 木框高光与内凹 */
+.frame::before {
+  content: '';
+  position: absolute; inset: 6px;
+  border-radius: 4px;
+  background: #040610;
+  box-shadow:
+    inset 0 0 0 1px rgba(255,255,255,0.05),
+    inset 0 0 24px rgba(0,0,0,0.85);
+}
+.frame::after {
+  /* 木框金色细线，提升质感 */
+  content: '';
+  position: absolute; inset: 3px;
+  border: 1px solid rgba(246, 217, 140, 0.12);
+  border-radius: 5px;
+  pointer-events: none;
+}
+
+/* 画框内部画面 */
+.canvas {
+  position: absolute; inset: clamp(10px, 1.6vw, 18px);
+  border-radius: 3px;
+  overflow: hidden;
+  background: #000;
+}
+
+/* 真实礼物图 */
+.frame-image {
+  position: absolute; inset: 0;
+  width: 100%; height: 100%;
+  object-fit: cover;
+  filter: blur(10px) brightness(0.35);    /* 初始：雾蒙蒙 */
+  transition: filter 2.4s cubic-bezier(0.25, 0.6, 0.3, 1);
+  opacity: 1;
+}
+
+/* 黑幕 —— 随着点亮进度整体变透明 */
+.frame-dim {
+  position: absolute; inset: 0;
+  background: radial-gradient(ellipse at 50% 42%, rgba(0,0,0,0.88) 20%, rgba(0,0,0,0.98) 85%);
+  opacity: 0.98;
+  transition: opacity 2.4s cubic-bezier(0.25, 0.6, 0.3, 1);
+  pointer-events: none;
+}
+
+/* 光圈 —— 从中心向外扩散 */
+.frame-iris {
+  position: absolute; inset: 0;
+  background:
+    radial-gradient(circle at 50% 44%,
+      rgba(255, 240, 200, 0.35) 0%,
+      rgba(180, 210, 255, 0.18) 25%,
+      transparent 55%);
+  transform: scale(0.25);
+  opacity: 0;
+  transition: transform 2.4s cubic-bezier(0.25, 0.6, 0.3, 1),
+              opacity 2.4s ease;
+  mix-blend-mode: screen;
+  pointer-events: none;
+}
+
+/* 扫光 —— 每次解锁的仪式感 */
+.sweep {
+  position: absolute; inset: 0;
+  background: linear-gradient(110deg, transparent 0%, transparent 38%, rgba(255,255,255,0.28) 50%, transparent 62%, transparent 100%);
+  transform: translateX(-110%);
+  opacity: 0;
+  pointer-events: none;
+  mix-blend-mode: screen;
+}
+.sweep.run { animation: sweepMove 1.8s ease; }
+@keyframes sweepMove {
+  0%   { transform: translateX(-110%); opacity: 0; }
+  25%  { opacity: 1; }
+  75%  { opacity: 1; }
+  100% { transform: translateX(110%); opacity: 0; }
+}
+
+/* 终极签名星 —— 仅在全部点亮后出现 */
+.signature-star {
+  position: absolute;
+  top: 42%; left: 50%;
+  width: 14px; height: 14px;
+  margin: -7px 0 0 -7px;
+  background: #fff;
+  border-radius: 50%;
+  box-shadow:
+    0 0 14px #fff,
+    0 0 32px rgba(255, 240, 180, 0.95),
+    0 0 70px rgba(246, 217, 140, 0.75);
+  opacity: 0;
+  transform: scale(0.4);
+  transition: all 2.2s cubic-bezier(0.25, 0.6, 0.3, 1);
+  mix-blend-mode: screen;
+  pointer-events: none;
+}
+.signature-star::before,
+.signature-star::after {
+  content: '';
+  position: absolute; top: 50%; left: 50%;
+  background: linear-gradient(to bottom, transparent, rgba(255,255,255,0.9), transparent);
+  transform: translate(-50%, -50%);
+}
+.signature-star::before { width: 1px; height: 50px; }
+.signature-star::after  { width: 50px; height: 1px; }
+body.final .signature-star {
+  opacity: 1;
+  transform: scale(1);
+  animation: sigPulse 3.2s ease-in-out infinite 2s;
+}
+@keyframes sigPulse {
+  0%,100% { transform: scale(1); }
+  50%     { transform: scale(1.2); }
+}
+
+/* =========================================================
+   页面内容（覆盖在画框之上）
+   ========================================================= */
+.page {
+  position: relative;
+  z-index: 3;
+  padding: 0 20px 80px;
+}
+
+/* 顶部大标题 */
+.hero {
+  min-height: 100vh;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  text-align: center;
+  padding: 60px 10px;
+  position: relative;
+}
+
+.title {
+  font-family: var(--font-hand);
+  font-weight: normal;
+  font-size: clamp(22px, 3.4vw, 34px);
+  letter-spacing: 0.25em;
+  padding-left: 0.25em;
+  color: #fff;
+  text-shadow: 0 0 20px rgba(180, 200, 255, 0.4), 0 0 40px rgba(100, 140, 220, 0.18);
+  opacity: 0;
+  animation: softIn 1.8s ease 0.4s forwards;
+}
+.title .star {
+  display: inline-block; margin: 0 14px;
+  color: var(--warm-gold);
+  transform: translateY(-4px);
+  text-shadow: 0 0 14px var(--warm-gold-soft);
+}
+@keyframes softIn {
+  from { opacity: 0; transform: translateY(14px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.intro {
+  max-width: 560px;
+  margin: 36px auto 0;
+  font-size: clamp(16px, 2.1vw, 21px);
+  line-height: 2.3;
+  color: var(--silver);
+  font-weight: normal;
+  letter-spacing: 0.08em;
+  opacity: 0;
+  animation: softIn 2s ease 1.4s forwards;
+}
+.intro b { color: #fff; font-weight: normal; text-shadow: 0 0 10px rgba(255,255,255,0.4); }
+.intro .soft { color: var(--silver-dim); display: block; margin-top: 16px; font-size: 0.92em; }
+
+.scroll-cue {
+  margin-top: 56px;
+  font-size: 13px;
+  color: var(--mist);
+  letter-spacing: 0.4em;
+  padding-left: 0.4em;
+  opacity: 0;
+  animation: softIn 1.6s ease 2.6s forwards, floatY 2.6s ease-in-out 2.8s infinite;
+}
+@keyframes floatY {
+  0%,100% { transform: translateY(0); }
+  50%     { transform: translateY(8px); }
+}
+
+/* =========================================================
+   章节（7 个存档点）
+   ========================================================= */
+.chapter {
+  min-height: 90vh;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  padding: 80px 10px;
+  position: relative;
+  opacity: 0;
+  transform: translateY(40px);
+  transition: opacity 1.6s ease, transform 1.6s ease;
+  pointer-events: none;
+}
+.chapter.active {
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
+}
+
+/* 章节内容定位 —— 左右交错让画面更有呼吸 */
+.chapter.side-left  .ch-inner { margin-right: auto; margin-left: 4%; }
+.chapter.side-right .ch-inner { margin-left: auto;  margin-right: 4%; }
+.chapter.side-center .ch-inner { margin: 0 auto; }
+
+.ch-inner {
+  width: 100%;
+  max-width: 520px;
+  display: flex; flex-direction: column;
+  align-items: center;
+}
+
+/* 可点击的存档物件 */
+.item {
+  position: relative;
+  width: clamp(76px, 9vw, 104px);
+  height: clamp(76px, 9vw, 104px);
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer;
+  background: radial-gradient(circle at 32% 28%, rgba(255,255,255,0.12), rgba(10, 16, 36, 0.78) 72%);
+  border: 1px solid rgba(246, 217, 140, 0.3);
+  box-shadow:
+    0 8px 30px rgba(0,0,0,0.55),
+    0 0 26px rgba(246, 217, 140, 0.22),
+    inset 0 0 0 1px rgba(255,255,255,0.04);
+  backdrop-filter: blur(6px);
+  transition: transform .35s ease, box-shadow .35s ease, border-color .35s ease, opacity .8s ease;
+  animation: itemFloat 5.5s ease-in-out infinite;
+}
+@keyframes itemFloat {
+  0%,100% { transform: translateY(0); }
+  50%     { transform: translateY(-8px); }
+}
+.item::before {
+  /* 柔光晕 */
+  content: '';
+  position: absolute; inset: -10px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(246, 217, 140, 0.28), transparent 70%);
+  z-index: -1;
+  animation: halo 4s ease-in-out infinite;
+}
+@keyframes halo { 0%,100% { opacity: 0.35; } 50% { opacity: 0.75; } }
+.item svg { width: 54%; height: 54%; opacity: 0.95; }
+
+.item:hover {
+  transform: scale(1.1);
+  border-color: rgba(246, 217, 140, 0.85);
+  box-shadow:
+    0 10px 36px rgba(0,0,0,0.55),
+    0 0 40px rgba(246, 217, 140, 0.55);
+}
+
+.item .tip {
+  position: absolute;
+  bottom: -34px; left: 50%;
+  transform: translateX(-50%) translateY(4px);
+  white-space: nowrap;
+  padding: 5px 14px;
+  border: 1px solid rgba(246, 217, 140, 0.35);
+  border-radius: 999px;
+  font-size: 13px; letter-spacing: 0.18em;
+  color: var(--warm-gold);
+  background: rgba(10, 15, 35, 0.88);
+  font-family: var(--font-hand);
+  opacity: 0; pointer-events: none;
+  transition: opacity .25s ease, transform .25s ease;
+}
+.item:hover .tip { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+/* 已归档 */
+.item.archived {
+  opacity: 0.55;
+  cursor: default;
+  border-color: rgba(246, 217, 140, 0.55);
+  box-shadow: 0 0 20px rgba(246, 217, 140, 0.3);
+  animation: itemFloat 9s ease-in-out infinite;
+}
+.item.archived::after {
+  content: '✦';
+  position: absolute; top: -6px; right: -6px;
+  width: 22px; height: 22px;
+  font-size: 12px;
+  display: flex; align-items: center; justify-content: center;
+  border-radius: 50%;
+  background: var(--warm-gold);
+  color: #0a0d1c;
+  box-shadow: 0 0 10px var(--warm-gold-soft);
+  font-family: serif;
+}
+.item.archived:hover { transform: scale(1); }
+
+/* 刚被点亮的脉冲 */
+.item.pulsing { animation: archivePulse 0.9s ease; }
+@keyframes archivePulse {
+  0%   { transform: scale(1); }
+  40%  { transform: scale(1.35); box-shadow: 0 0 48px rgba(246, 217, 140, 0.95); }
+  100% { transform: scale(1); }
+}
+
+/* 章节序号提示 */
+.ch-index {
+  font-family: var(--font-hand);
+  font-size: 14px;
+  letter-spacing: 0.4em;
+  color: var(--warm-gold-soft);
+  margin-bottom: 24px;
+  padding-left: 0.4em;
+}
+
+/* 故事卡 —— 宇宙卡片 */
+.card {
+  width: 100%;
+  margin-top: 36px;
+  padding: 30px 34px 34px;
+  border-radius: 16px;
+  background:
+    linear-gradient(160deg, rgba(20, 26, 56, 0.62), rgba(10, 14, 30, 0.78));
+  border: 1px solid rgba(246, 217, 140, 0.12);
+  box-shadow:
+    0 20px 60px rgba(0,0,0,0.55),
+    0 0 0 1px rgba(255,255,255,0.03),
+    0 0 40px rgba(110, 140, 220, 0.1);
+  backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
+  opacity: 0; transform: translateY(16px);
+  transition: opacity 1.2s ease, transform 1.2s ease;
+  pointer-events: none;
+}
+.card.shown { opacity: 1; transform: translateY(0); pointer-events: auto; }
+.card::before {
+  content: '';
+  position: absolute;
+  top: -1px; left: 12%; right: 12%; height: 1px;
+  background: linear-gradient(to right, transparent, rgba(246, 217, 140, 0.6), transparent);
+}
+
+.card-title {
+  font-family: var(--font-hand);
+  font-size: clamp(16px, 2vw, 20px);
+  color: var(--warm-gold);
+  letter-spacing: 0.22em;
+  padding-left: 0.22em;
+  margin-bottom: 18px;
+  display: flex; align-items: center; gap: 10px;
+}
+.card-title .dot {
+  width: 5px; height: 5px; border-radius: 50%;
+  background: var(--warm-gold);
+  box-shadow: 0 0 10px var(--warm-gold-soft);
+  flex-shrink: 0;
+}
+
+.card-body {
+  font-family: var(--font-hand);
+  font-size: clamp(16px, 2vw, 20px);
+  line-height: 2.15;
+  color: var(--silver);
+  letter-spacing: 0.08em;
+}
+.card-body p { margin-bottom: 4px; }
+.card-body b { color: #fff; font-weight: normal; text-shadow: 0 0 10px rgba(255,255,255,0.4); }
+.card-body .egg {
+  display: block; margin-top: 18px;
+  font-size: 0.88em;
+  color: var(--mist);
+  letter-spacing: 0.05em;
+}
+
+.ch-next-cue {
+  margin-top: 40px;
+  font-size: 13px;
+  color: var(--mist);
+  letter-spacing: 0.4em;
+  padding-left: 0.4em;
+  opacity: 0;
+  transition: opacity 1.2s ease 0.6s;
+  animation: floatY 2.6s ease-in-out infinite;
+}
+.card.shown ~ .ch-next-cue { opacity: 1; }
+
+/* =========================================================
+   最终揭晓
+   ========================================================= */
+.finale {
+  min-height: 90vh;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  text-align: center;
+  padding: 80px 20px 60px;
+  opacity: 0;
+  transform: translateY(30px);
+  transition: opacity 2s ease, transform 2s ease;
+}
+.finale.show { opacity: 1; transform: translateY(0); }
+
+.finale-main {
+  font-family: var(--font-hand);
+  font-size: clamp(24px, 4vw, 42px);
+  font-weight: normal;
+  letter-spacing: 0.28em;
+  padding-left: 0.28em;
+  color: #fff;
+  text-shadow:
+    0 0 18px rgba(255, 255, 255, 0.55),
+    0 0 45px rgba(246, 217, 140, 0.4);
+  animation: finaleGlow 4.2s ease-in-out infinite;
+}
+@keyframes finaleGlow {
+  0%,100% { text-shadow: 0 0 18px rgba(255,255,255,0.45), 0 0 45px rgba(246, 217, 140, 0.32); }
+  50%     { text-shadow: 0 0 26px rgba(255,255,255,0.85), 0 0 70px rgba(246, 217, 140, 0.65); }
+}
+
+.finale-wish {
+  margin-top: 32px;
+  font-size: clamp(16px, 2vw, 20px);
+  line-height: 2.2;
+  color: var(--silver);
+  letter-spacing: 0.1em;
+  max-width: 560px;
+  opacity: 0;
+  transition: opacity 2s ease 2.2s;
+}
+.finale.show .finale-wish { opacity: 1; }
+
+/* =========================================================
+   进度器（角落）
+   ========================================================= */
+.progress {
+  position: fixed; top: 22px; right: 24px;
+  z-index: 50;
+  display: flex; align-items: center; gap: 12px;
+  padding: 9px 16px 9px 18px;
+  border: 1px solid rgba(246, 217, 140, 0.22);
+  border-radius: 999px;
+  background: rgba(8, 12, 28, 0.55);
+  backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+  font-family: var(--font-hand);
+  font-size: 15px; letter-spacing: 0.2em;
+  padding-left: 20px;
+  color: var(--silver-dim);
+  opacity: 0;
+  animation: softIn 1.6s ease 2s forwards;
+}
+.progress .count { color: var(--warm-gold); min-width: 30px; text-align: center; }
+.progress .dots { display: flex; gap: 5px; margin-left: 4px; }
+.progress .dot {
+  width: 6px; height: 6px; border-radius: 50%;
+  background: rgba(236, 239, 255, 0.2);
+  transition: all .6s ease;
+}
+.progress .dot.on {
+  background: var(--warm-gold);
+  box-shadow: 0 0 10px var(--warm-gold-soft);
+}
+
+/* =========================================================
+   右下彩蛋
+   ========================================================= */
+.easter {
+  position: fixed; bottom: 22px; right: 24px;
+  max-width: 300px;
+  font-family: var(--font-hand);
+  font-size: 14px;
+  letter-spacing: 0.06em;
+  line-height: 1.85;
+  color: rgba(236, 239, 255, 0.45);
+  text-align: right;
+  z-index: 40;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 2s ease;
+}
+.easter.show { opacity: 1; }
+
+/* =========================================================
+   流星 / 星尘
+   ========================================================= */
+.shooting-star {
+  position: fixed;
+  width: 7px; height: 7px;
+  background: radial-gradient(circle, #fff, rgba(255,255,255,0));
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 60;
+  box-shadow: 0 0 14px #fff, 0 0 28px var(--warm-gold-soft);
+}
+.shooting-star::after {
+  content: '';
+  position: absolute; right: 100%; top: 50%;
+  width: 48px; height: 1px;
+  background: linear-gradient(to left, rgba(255,255,255,0.9), transparent);
+  transform: translateY(-50%);
+}
+.dust-burst {
+  position: fixed;
+  width: 3px; height: 3px; border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 0 8px var(--warm-gold-soft);
+  pointer-events: none;
+  z-index: 60;
+}
+
+/* 初始黑幕 */
+.page-mask {
+  position: fixed; inset: 0; background: #000;
+  z-index: 999; pointer-events: none;
+  animation: pageReveal 2s ease forwards;
+}
+@keyframes pageReveal { 0% { opacity: 1; } 100% { opacity: 0; } }
+
+/* =========================================================
+   响应式
+   ========================================================= */
+@media (max-width: 720px) {
+  .frame-stage {
+    height: 50vh;
+    top: 30%;
+  }
+  .frame {
+    transform: rotateY(6deg) rotateX(-3deg) rotateZ(-1deg);
+  }
+  .hero { min-height: 100vh; padding-top: 60vh; }
+  .chapter { min-height: auto; padding: 60px 10px; }
+  .chapter.side-left .ch-inner,
+  .chapter.side-right .ch-inner {
+    margin: 0 auto;
+  }
+  .card { padding: 22px 22px 26px; }
+  .progress { top: 14px; right: 12px; font-size: 12px; padding: 6px 12px 6px 14px; }
+  .easter { bottom: 12px; right: 12px; font-size: 12px; max-width: 220px; }
+  .item { width: 72px; height: 72px; }
+}
+</style>
+</head>
+<body data-step="0">
+
+<!-- 初始黑幕 -->
+<div class="page-mask"></div>
+
+<!-- 背景：星云 + canvas 星场 -->
+<div class="sky" aria-hidden="true">
+  <div class="nebula"></div>
+  <canvas id="stars-canvas"></canvas>
+</div>
+
+<!-- 固定画框舞台（背景） -->
+<div class="frame-stage" id="frameStage">
+  <div class="frame">
+    <div class="canvas">
+      <!-- ★ 替换真实礼物图：把 ./星空.jpg 换成你的路径即可 -->
+      <img class="frame-image" id="finalGiftImage" src="./星空.jpg" alt="" />
+      <div class="frame-dim"  id="frameDim"></div>
+      <div class="frame-iris" id="frameIris"></div>
+      <div class="sweep"      id="sweep"></div>
+      <div class="signature-star"></div>
+    </div>
+  </div>
+</div>
+
+<!-- 进度器 -->
+<div class="progress">
+  <span class="label">已点亮</span>
+  <span class="count"><span id="count">0</span> / 7</span>
+  <span class="dots" id="dots"></span>
+</div>
+
+<div class="page">
+
+  <!-- 顶部：标题 + 引导 -->
+  <section class="hero">
+    <h1 class="title">
+      <span class="star">✦</span>
+      请查收，一段被宇宙偷偷存档的缘分
+      <span class="star">✦</span>
+    </h1>
+    <p class="intro">
+      <b>这本来只是一个黑黑的画框。</b><br>
+      直到有些人出现，宇宙才开始慢慢有内容。
+      <span class="soft">
+        点一点那些被宇宙偷偷存档的小东西，<br>
+        它们是缘分路过时，不小心漏下的一点光。
+      </span>
+    </p>
+    <div class="scroll-cue">↓ 往下走 ↓</div>
+  </section>
+
+  <!-- 章节 1：岩点 -->
+  <section class="chapter side-center active" data-ch="1">
+    <div class="ch-inner">
+      <div class="ch-index">存档 · 01</div>
+      <div class="item" data-index="0" aria-label="岩点">
+        <svg viewBox="0 0 48 48" fill="none">
+          <path d="M12 34 L18 20 L26 14 L36 18 L40 28 L34 38 L20 40 Z"
+                stroke="#f6d98c" stroke-width="1.6" stroke-linejoin="round"
+                fill="rgba(246,217,140,0.1)"/>
+          <circle cx="22" cy="24" r="1.4" fill="#fff"/>
+          <circle cx="30" cy="28" r="1.2" fill="#fff"/>
+          <circle cx="26" cy="32" r="1" fill="#fff"/>
+        </svg>
+        <span class="tip">岩点 · mellow</span>
+      </div>
+      <div class="card">
+        <div class="card-title"><span class="dot"></span>去年 4 月 · mellow</div>
+        <div class="card-body">
+          <p>故事开始于去年 4 月。</p>
+          <p>地点：mellow 攀岩馆。</p>
+          <p>那是我第一节攀岩课，而你，是我的教练。</p>
+          <p>本来这应该只是一次普通上课。</p>
+          <p>结果缘分居然很有主见，偷偷给我们开了个隐藏副本。</p>
+        </div>
+      </div>
+      <div class="ch-next-cue">↓</div>
+    </div>
+  </section>
+
+  <!-- 章节 2：吉他拨片 -->
+  <section class="chapter side-right" data-ch="2">
+    <div class="ch-inner">
+      <div class="ch-index">存档 · 02</div>
+      <div class="item" data-index="1" aria-label="吉他拨片">
+        <svg viewBox="0 0 48 48" fill="none">
+          <path d="M24 10 C32 10 38 16 38 22 C38 30 30 40 24 40 C18 40 10 30 10 22 C10 16 16 10 24 10 Z"
+                stroke="#f6d98c" stroke-width="1.6" fill="rgba(246,217,140,0.1)"/>
+          <path d="M27 18 L27 28" stroke="#fff" stroke-width="1.2" stroke-linecap="round"/>
+          <circle cx="26" cy="29" r="1.8" fill="#fff"/>
+        </svg>
+        <span class="tip">拨片 · 指弹</span>
+      </div>
+      <div class="card">
+        <div class="card-title"><span class="dot"></span>一把吉他 · 本苏三</div>
+        <div class="card-body">
+          <p>课后我发现，你的头像是一把吉他。</p>
+          <p>而我，刚好也喜欢指弹。</p>
+          <p>于是我问了一句：你也喜欢指弹吗？</p>
+          <p>后来你给我分享了本苏三。</p>
+          <p>然后我们就这样，从一把吉他开始，慢慢有了联系。</p>
+          <span class="egg">◦ 有时候人与人的连接，真的很像宇宙发来的随机配对 ◦</span>
+        </div>
+      </div>
+      <div class="ch-next-cue">↓</div>
+    </div>
+  </section>
+
+  <!-- 章节 3：咖啡杯 -->
+  <section class="chapter side-left" data-ch="3">
+    <div class="ch-inner">
+      <div class="ch-index">存档 · 03</div>
+      <div class="item" data-index="2" aria-label="咖啡杯">
+        <svg viewBox="0 0 48 48" fill="none">
+          <path d="M14 22 L14 34 C14 36.5 16 38 18 38 L30 38 C32 38 34 36.5 34 34 L34 22 Z"
+                stroke="#f6d98c" stroke-width="1.6" fill="rgba(246,217,140,0.1)" stroke-linejoin="round"/>
+          <path d="M34 25 L38 25 C40 25 41 26.5 41 28 C41 29.5 40 31 38 31 L34 31"
+                stroke="#f6d98c" stroke-width="1.6" stroke-linecap="round"/>
+          <path d="M19 14 C19 16 21 16 21 18" stroke="#fff" stroke-width="1.2" stroke-linecap="round" opacity="0.8"/>
+          <path d="M24 12 C24 14 26 14 26 16" stroke="#fff" stroke-width="1.2" stroke-linecap="round" opacity="0.8"/>
+          <path d="M29 14 C29 16 31 16 31 18" stroke="#fff" stroke-width="1.2" stroke-linecap="round" opacity="0.8"/>
+        </svg>
+        <span class="tip">一杯咖啡</span>
+      </div>
+      <div class="card">
+        <div class="card-title"><span class="dot"></span>一起喝过的咖啡</div>
+        <div class="card-body">
+          <p>后来，我们一起喝了咖啡。</p>
+          <p>有些关系并不是突然变熟的。</p>
+          <p>而是从"这个人还挺有意思"，</p>
+          <p>慢慢变成"诶，我居然已经认识你一段时间了"。</p>
+          <p>像星星一点一点亮起来，不吵，但很真。</p>
+        </div>
+      </div>
+      <div class="ch-next-cue">↓</div>
+    </div>
+  </section>
+
+  <!-- 章节 4：发卡 -->
+  <section class="chapter side-right" data-ch="4">
+    <div class="ch-inner">
+      <div class="ch-index">存档 · 04</div>
+      <div class="item" data-index="3" aria-label="发卡">
+        <svg viewBox="0 0 48 48" fill="none">
+          <path d="M10 30 C14 22 24 18 34 20 C38 20.6 40 22 40 24 C40 26 38 27 34 26.5 C24 25 14 28 10 34 Z"
+                stroke="#f6d98c" stroke-width="1.6" fill="rgba(246,217,140,0.1)" stroke-linejoin="round"/>
+          <circle cx="36" cy="23" r="1.8" fill="#fff"/>
+          <circle cx="14" cy="32" r="1.2" fill="#fff" opacity="0.7"/>
+        </svg>
+        <span class="tip">发卡 · 已飞走</span>
+      </div>
+      <div class="card">
+        <div class="card-title"><span class="dot"></span>去年七八月 · 发卡先一步自由了</div>
+        <div class="card-body">
+          <p>再后来，去年七八月的时候，</p>
+          <p>你第一次骑摩托车带我去兜风。</p>
+          <p>风很大，路很长，发卡很轻。</p>
+          <p>轻到它中途直接被风吹跑了。</p>
+          <br>
+          <p>现在回想起来，那天很像一部预算不高但氛围很好的青春片。</p>
+          <p>连我的发卡都决定先一步自由飞翔。</p>
+        </div>
+      </div>
+      <div class="ch-next-cue">↓</div>
+    </div>
+  </section>
+
+  <!-- 章节 5：望远镜 -->
+  <section class="chapter side-left" data-ch="5">
+    <div class="ch-inner">
+      <div class="ch-index">存档 · 05</div>
+      <div class="item" data-index="4" aria-label="小望远镜">
+        <svg viewBox="0 0 48 48" fill="none">
+          <path d="M10 28 L24 18 L38 20 L34 30 L20 32 Z"
+                stroke="#f6d98c" stroke-width="1.6" fill="rgba(246,217,140,0.1)" stroke-linejoin="round"/>
+          <circle cx="32" cy="25" r="2.6" stroke="#fff" stroke-width="1.2" fill="none"/>
+          <path d="M16 34 L16 38 M22 35 L22 39" stroke="#f6d98c" stroke-width="1.4" stroke-linecap="round"/>
+          <circle cx="40" cy="10" r="1.2" fill="#fff"/>
+          <circle cx="44" cy="14" r="0.8" fill="#fff"/>
+        </svg>
+        <span class="tip">看星空展</span>
+      </div>
+      <div class="card">
+        <div class="card-title"><span class="dot"></span>10.23 · 星空展 &amp; 观景塔</div>
+        <div class="card-body">
+          <p>后来，到了 10.23，我生日。</p>
+          <p>你带我去看了星空展。</p>
+          <p>级别上大概属于"家长带小朋友接受科普知识"。</p>
+          <p>但我还是很开心。</p>
+          <br>
+          <p>尤其感谢你在工作电话对你进行狂轰乱炸的时候，</p>
+          <p>依然努力在"商务热线接线员"和"寿星陪伴嘉宾"之间来回切换。</p>
+          <p>虽然我一度像被临时放置在旁边的小朋友，</p>
+          <p>但现在想起来还是觉得很好笑，也很感谢。</p>
+          <br>
+          <p>后来我们还去了奥林匹克公园观景塔。</p>
+          <p>工作人员一本正经地说，那是北京人能上的最高地方。</p>
+          <p>这个说法我至今觉得带着一点神秘主义色彩。</p>
+          <p>但那天的风景和心情，我都记到了现在。</p>
+        </div>
+      </div>
+      <div class="ch-next-cue">↓</div>
+    </div>
+  </section>
+
+  <!-- 章节 6：小飞机 -->
+  <section class="chapter side-right" data-ch="6">
+    <div class="ch-inner">
+      <div class="ch-index">存档 · 06</div>
+      <div class="item" data-index="5" aria-label="小飞机">
+        <svg viewBox="0 0 48 48" fill="none">
+          <path d="M6 26 L22 22 L30 10 L34 11 L28 24 L40 28 L40 31 L26 30 L20 38 L17 37 L19 28 L6 28 Z"
+                stroke="#f6d98c" stroke-width="1.5" fill="rgba(246,217,140,0.1)" stroke-linejoin="round"/>
+        </svg>
+        <span class="tip">机场 · 烧鸟</span>
+      </div>
+      <div class="card">
+        <div class="card-title"><span class="dot"></span>12 月 · 机场 &amp; 烧鸟</div>
+        <div class="card-body">
+          <p>再后来，到了去年 12 月。</p>
+          <p>我从深圳回北京，你来机场接我。</p>
+          <p>那天晚上，我们一起去吃了烧鸟。</p>
+          <p>顺便我还收获了一个很有分量的饮食评价：<b>事儿妈</b>。</p>
+          <br>
+          <p>怎么说呢，称呼听起来不是很像奖项，</p>
+          <p>但被你这样讲出来，居然也莫名其妙地进了我的回忆收藏夹。</p>
+        </div>
+      </div>
+      <div class="ch-next-cue">↓</div>
+    </div>
+  </section>
+
+  <!-- 章节 7：雪花 -->
+  <section class="chapter side-center" data-ch="7">
+    <div class="ch-inner">
+      <div class="ch-index">存档 · 07</div>
+      <div class="item" data-index="6" aria-label="雪花">
+        <svg viewBox="0 0 48 48" fill="none" stroke="#f6d98c" stroke-width="1.6" stroke-linecap="round">
+          <path d="M24 8 L24 40 M8 24 L40 24 M13 13 L35 35 M35 13 L13 35"/>
+          <path d="M24 8 L21 11 M24 8 L27 11 M24 40 L21 37 M24 40 L27 37 M8 24 L11 21 M8 24 L11 27 M40 24 L37 21 M40 24 L37 27"/>
+        </svg>
+        <span class="tip">雪山 · 滑雪</span>
+      </div>
+      <div class="card">
+        <div class="card-title"><span class="dot"></span>同一片坐标 · 滑雪</div>
+        <div class="card-body">
+          <p>再后来，就是滑雪。</p>
+          <p>在那之前，我已经知道你喜欢滑雪。</p>
+          <p>所以这件事更像是：</p>
+          <p>我们又在同一片坐标里，碰上了一次。</p>
+          <br>
+          <p>攀岩、吉他、咖啡、摩托车、星空、接机、烧鸟、滑雪……</p>
+          <p>这些原本零零散散的小事，后来居然真的连成了一条银河。</p>
+          <br>
+          <p><b>所以今年 4.21，轮到我送你一片星空。</b></p>
+        </div>
+      </div>
+      <div class="ch-next-cue">↓</div>
+    </div>
+  </section>
+
+  <!-- 最终揭晓 -->
+  <section class="finale" id="finale">
+    <div class="finale-main">现在，请打开我为你做的星空吧。</div>
+    <div class="finale-wish">
+      生日快乐。<br>
+      谢谢你把一些原本普通的日子，<br>
+      变成了后来会发光的回忆。
+    </div>
+  </section>
+
+</div>
+
+<!-- 右下彩蛋 -->
+<div class="easter" id="easter">
+  PS：那个星空展虽然更像亲子科普活动，<br>
+  但带我去看的人很加分。
+</div>
+
+<script>
+/* =============================================================
+   Canvas 星场
+   ============================================================= */
+(function starfield() {
+  const cvs = document.getElementById('stars-canvas');
+  const ctx = cvs.getContext('2d');
+  let W, H, stars = [];
+
+  function resize() {
+    W = cvs.width  = window.innerWidth  * devicePixelRatio;
+    H = cvs.height = window.innerHeight * devicePixelRatio;
+    cvs.style.width  = window.innerWidth  + 'px';
+    cvs.style.height = window.innerHeight + 'px';
+    const count = Math.floor((W * H) / (devicePixelRatio * 16000));
+    stars = [];
+    for (let i = 0; i < count; i++) {
+      stars.push({
+        x: Math.random() * W,
+        y: Math.random() * H,
+        r: Math.random() * 1.4 * devicePixelRatio + 0.3,
+        base: Math.random() * 0.5 + 0.3,
+        phase: Math.random() * Math.PI * 2,
+        speed: Math.random() * 0.014 + 0.004,
+        hue: Math.random() < 0.14 ? 'warm' : (Math.random() < 0.3 ? 'blue' : 'white')
+      });
+    }
+  }
+  window.addEventListener('resize', resize);
+  resize();
+
+  function loop(t) {
+    ctx.clearRect(0, 0, W, H);
+    for (const s of stars) {
+      const a = s.base + Math.sin(t * s.speed + s.phase) * 0.4;
+      ctx.globalAlpha = Math.max(0, Math.min(1, a));
+      if (s.hue === 'warm')      ctx.fillStyle = '#f6d98c';
+      else if (s.hue === 'blue') ctx.fillStyle = '#b4c8ff';
+      else                        ctx.fillStyle = '#ffffff';
+      ctx.beginPath();
+      ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
+      ctx.fill();
+    }
+    requestAnimationFrame(loop);
+  }
+  requestAnimationFrame(loop);
+})();
+
+/* =============================================================
+   核心交互：7 个章节按顺序解锁
+   ============================================================= */
+const state = {
+  step: 0,                                    // 下一个待点击的序号
+  unlocked: [false, false, false, false, false, false, false],
+  finaleTriggered: false,
+};
+
+const els = {
+  body:       document.body,
+  items:      document.querySelectorAll('.item'),
+  chapters:   document.querySelectorAll('.chapter'),
+  count:      document.getElementById('count'),
+  dots:       document.getElementById('dots'),
+  finale:     document.getElementById('finale'),
+  easter:     document.getElementById('easter'),
+  sweep:      document.getElementById('sweep'),
+  dim:        document.getElementById('frameDim'),
+  iris:       document.getElementById('frameIris'),
+  img:        document.getElementById('finalGiftImage'),
+  frameStage: document.getElementById('frameStage'),
+};
+
+/* 初始化进度小点 */
+(function initDots() {
+  for (let i = 0; i < 7; i++) {
+    const d = document.createElement('span');
+    d.className = 'dot';
+    els.dots.appendChild(d);
+  }
+})();
+
+/* 点击绑定 */
+els.items.forEach(el => {
+  el.addEventListener('click', () => handleClick(parseInt(el.dataset.index, 10), el));
+});
+
+/* 若真图加载失败，保底 —— 不让画框空白 */
+els.img.addEventListener('error', () => {
+  els.img.style.background =
+    'radial-gradient(circle at 50% 42%, #f6d98c 0%, #b37a2a 4%, #332c1a 8%, #060811 40%, #02040a 100%)';
+  els.img.removeAttribute('src');
+});
+
+function handleClick(index, el) {
+  if (state.unlocked[index]) return;
+  if (index !== state.step) return;       // 只有当前活跃章节可点击（其他章节 pointer-events:none，正常不会触发）
+
+  state.unlocked[index] = true;
+  state.step = index + 1;
+
+  // item 归档脉冲
+  el.classList.add('pulsing');
+  setTimeout(() => {
+    el.classList.remove('pulsing');
+    el.classList.add('archived');
+  }, 700);
+
+  // 流星飞向画框
+  shootStarFrom(el);
+
+  // 卡片展开
+  const chapter = el.closest('.chapter');
+  const card = chapter.querySelector('.card');
+  card.classList.add('shown');
+
+  // 画框再揭开一层
+  updateFrameReveal(state.step);
+
+  // 进度更新
+  updateProgress();
+
+  // 激活下一章节（淡入，用户自然往下滚）
+  if (state.step < 7) {
+    const nextChapter = document.querySelector(`.chapter[data-ch="${state.step + 1}"]`);
+    if (nextChapter) {
+      setTimeout(() => nextChapter.classList.add('active'), 900);
+    }
+  } else if (!state.finaleTriggered) {
+    state.finaleTriggered = true;
+    setTimeout(triggerFinale, 1800);
+  }
+}
+
+function updateProgress() {
+  const done = state.unlocked.filter(Boolean).length;
+  els.count.textContent = done;
+  [...els.dots.children].forEach((d, i) => {
+    d.classList.toggle('on', state.unlocked[i]);
+  });
+}
+
+/* =============================================================
+   画框逐层揭开：黑幕减淡 + 光圈扩张 + 模糊散去
+   ============================================================= */
+const revealSteps = [
+  { dim: 0.97, iris: { s: 0.25, o: 0 },    blur: 12, bright: 0.32 },  // step 0（初始）
+  { dim: 0.86, iris: { s: 0.5,  o: 0.55 }, blur: 9,  bright: 0.42 },
+  { dim: 0.72, iris: { s: 0.75, o: 0.7 },  blur: 7,  bright: 0.55 },
+  { dim: 0.56, iris: { s: 0.95, o: 0.75 }, blur: 5.2,bright: 0.68 },
+  { dim: 0.40, iris: { s: 1.15, o: 0.8 },  blur: 3.5,bright: 0.82 },
+  { dim: 0.24, iris: { s: 1.3,  o: 0.75 }, blur: 2.2,bright: 0.92 },
+  { dim: 0.12, iris: { s: 1.5,  o: 0.55 }, blur: 1.2,bright: 1.0 },
+  { dim: 0.00, iris: { s: 1.8,  o: 0.25 }, blur: 0,  bright: 1.05 },  // step 7 完成
+];
+function updateFrameReveal(step) {
+  const v = revealSteps[step] || revealSteps[0];
+  els.dim.style.opacity  = v.dim;
+  els.iris.style.transform = `scale(${v.iris.s})`;
+  els.iris.style.opacity  = v.iris.o;
+  els.img.style.filter    = `blur(${v.blur}px) brightness(${v.bright})`;
+
+  // 每次揭开 —— 跑一次扫光
+  els.sweep.classList.remove('run');
+  void els.sweep.offsetWidth;
+  els.sweep.classList.add('run');
+}
+updateFrameReveal(0);
+
+/* =============================================================
+   流星：从 item 中心飞向画框中心，带抛物线
+   ============================================================= */
+function shootStarFrom(el) {
+  const rect = el.getBoundingClientRect();
+  const stageRect = els.frameStage.getBoundingClientRect();
+  const startX = rect.left + rect.width  / 2;
+  const startY = rect.top  + rect.height / 2;
+  const endX   = stageRect.left + stageRect.width  / 2;
+  const endY   = stageRect.top  + stageRect.height / 2;
+
+  const star = document.createElement('div');
+  star.className = 'shooting-star';
+  star.style.left = startX + 'px';
+  star.style.top  = startY + 'px';
+  document.body.appendChild(star);
+
+  const midX = (startX + endX) / 2 + (Math.random() * 60 - 30);
+  const midY = (startY + endY) / 2 - 50;
+
+  const anim = star.animate([
+    { transform: 'translate(0, 0) scale(1)',  opacity: 1, offset: 0 },
+    { transform: `translate(${midX - startX}px, ${midY - startY}px) scale(1.1)`, opacity: 1, offset: 0.55 },
+    { transform: `translate(${endX - startX}px, ${endY - startY}px) scale(0.35)`, opacity: 0, offset: 1 }
+  ], { duration: 1200, easing: 'cubic-bezier(0.2, 0.8, 0.35, 1)' });
+
+  anim.onfinish = () => star.remove();
+}
+
+/* =============================================================
+   最终揭晓
+   ============================================================= */
+function triggerFinale() {
+  els.body.classList.add('final');
+  els.finale.classList.add('active', 'show');
+  burstDust();
+
+  setTimeout(() => {
+    els.easter.classList.add('show');
+  }, 4000);
+
+  // 轻柔把 finale 滚到中央
+  setTimeout(() => {
+    els.finale.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }, 600);
+}
+
+function burstDust() {
+  const stageRect = els.frameStage.getBoundingClientRect();
+  const cx = stageRect.left + stageRect.width  / 2;
+  const cy = stageRect.top  + stageRect.height / 2;
+
+  for (let i = 0; i < 32; i++) {
+    const d = document.createElement('div');
+    d.className = 'dust-burst';
+    d.style.left = cx + 'px';
+    d.style.top  = cy + 'px';
+    document.body.appendChild(d);
+
+    const angle = Math.random() * Math.PI * 2;
+    const distance = Math.random() * 280 + 140;
+    const dx = Math.cos(angle) * distance;
+    const dy = Math.sin(angle) * distance;
+    const size = Math.random() * 2 + 1.5;
+    d.style.width = d.style.height = size + 'px';
+
+    const a = d.animate([
+      { transform: 'translate(0,0) scale(0.3)', opacity: 0 },
+      { transform: `translate(${dx*0.3}px, ${dy*0.3}px) scale(1)`, opacity: 1, offset: 0.25 },
+      { transform: `translate(${dx}px, ${dy}px) scale(0.4)`, opacity: 0 }
+    ], { duration: 2000 + Math.random() * 1200, easing: 'cubic-bezier(0.2, 0.7, 0.3, 1)' });
+    a.onfinish = () => d.remove();
+  }
+}
+
+/* =============================================================
+   桌面鼠标轻微视差（让画框跟视线微微"转头"）
+   ============================================================= */
+if (matchMedia('(hover: hover)').matches) {
+  const frame = document.querySelector('.frame');
+  document.addEventListener('mousemove', (e) => {
+    const x = (e.clientX / window.innerWidth  - 0.5);
+    const y = (e.clientY / window.innerHeight - 0.5);
+    if (frame) {
+      // 基础角度 + 跟鼠标轻微摆动
+      frame.style.transform =
+        `rotateY(${9 + x * -4}deg) rotateX(${-5 + y * 3}deg) rotateZ(-1.8deg)`;
+    }
+  });
+}
+</script>
+</body>
+</html>
