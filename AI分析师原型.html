@@ -1,0 +1,1349 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>瑜伽普拉提行业分析师</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --sage: #5A8A5E;
+    --sage-light: #8BB88F;
+    --sage-pale: #EEF4EE;
+    --sage-border: #d4e8d5;
+    --terra: #C97458;
+    --terra-pale: #FAF0EC;
+    --terra-border: #F0CDBE;
+    --terra-dark: #A05840;
+    --bg: #F8F5F0;
+    --card: #FFFFFF;
+    --border: #E5DED5;
+    --subtle: #F2EDE6;
+    --text: #2D2926;
+    --muted: #7C7670;
+    --light: #A8A29C;
+  }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    min-height: 100vh;
+  }
+
+  /* ── Layout ── */
+  .page { display: none; min-height: 100vh; }
+  .page.active { display: block; }
+  .container { max-width: 640px; margin: 0 auto; padding: 0 16px 64px; }
+
+  /* ── Navbar ── */
+  nav {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 14px 16px; max-width: 640px; margin: 0 auto;
+  }
+  .nav-brand { font-weight: 600; font-size: 16px; color: var(--sage); }
+  .nav-left { display: flex; align-items: center; gap: 10px; }
+  .btn-ghost {
+    font-size: 13px; padding: 6px 14px; border-radius: 99px;
+    border: 1px solid var(--border); color: var(--muted);
+    background: none; cursor: pointer; transition: border-color .15s;
+  }
+  .btn-ghost:hover { border-color: var(--sage); color: var(--sage); }
+
+  /* ── Search bar ── */
+  .search-wrap { position: relative; margin-bottom: 18px; }
+  .search-input {
+    width: 100%; border-radius: 16px; border: 1.5px solid var(--border);
+    padding: 14px 70px 14px 18px; font-size: 15px; outline: none;
+    background: var(--card); color: var(--text);
+    box-shadow: 0 2px 8px rgba(0,0,0,.06); transition: border-color .15s, box-shadow .15s;
+    font-family: inherit;
+  }
+  .search-input:focus { border-color: var(--sage); box-shadow: 0 0 0 3px rgba(90,138,94,.12); }
+  .search-btn {
+    position: absolute; right: 8px; top: 50%; transform: translateY(-50%);
+    background: var(--sage); color: #fff; border: none; border-radius: 10px;
+    padding: 8px 14px; font-size: 13px; font-weight: 500; cursor: pointer;
+    font-family: inherit; transition: opacity .15s;
+  }
+  .search-btn:hover { opacity: .85; }
+
+  /* ── Cards ── */
+  .card {
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 16px; padding: 20px;
+  }
+  .card + .card, .card-sm + .card-sm { margin-top: 10px; }
+  .card-sm {
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 12px; padding: 12px 14px;
+  }
+
+  /* ── Tags / chips ── */
+  .chip {
+    display: inline-block; border-radius: 99px; padding: 2px 10px;
+    font-size: 11px; font-weight: 500;
+  }
+  .chip-sage { background: var(--sage-pale); color: var(--sage); }
+  .chip-terra { background: var(--terra-pale); color: var(--terra); }
+  .chip-blue { background: #EBF3FB; color: #4A90D9; }
+
+  /* ── Quick questions ── */
+  .quick-list { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; margin-top: 16px; }
+  .quick-btn {
+    border-radius: 99px; border: 1px solid var(--border); padding: 7px 14px;
+    font-size: 13px; color: var(--muted); background: var(--card); cursor: pointer;
+    font-family: inherit; transition: border-color .15s, color .15s;
+  }
+  .quick-btn:hover { border-color: var(--sage); color: var(--sage); }
+
+  /* ── Goal grid ── */
+  .goal-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 10px; margin-bottom: 28px; }
+  .goal-btn {
+    background: var(--card); border: 1px solid var(--border); border-radius: 16px;
+    padding: 14px; text-align: left; cursor: pointer; font-family: inherit;
+    transition: transform .15s, box-shadow .15s;
+  }
+  .goal-btn:hover { transform: scale(1.02); box-shadow: 0 4px 12px rgba(0,0,0,.08); }
+  .goal-label { font-size: 15px; font-weight: 600; margin-bottom: 4px; }
+  .goal-desc { font-size: 11px; color: var(--muted); line-height: 1.5; }
+
+  /* ── Topic cards ── */
+  .topic-card {
+    background: var(--card); border: 1px solid var(--border); border-radius: 16px;
+    padding: 18px; cursor: pointer; margin-bottom: 10px;
+    transition: box-shadow .15s, border-color .15s;
+  }
+  .topic-card:hover { box-shadow: 0 4px 16px rgba(0,0,0,.08); border-color: var(--sage-light); }
+  .topic-row { display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; }
+  .topic-name { font-weight: 500; margin-bottom: 4px; font-size: 15px; }
+  .topic-intro { font-size: 13px; color: var(--muted); line-height: 1.6; }
+  .topic-tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
+
+  /* ── Section title ── */
+  .sec-title { font-size: 12px; font-weight: 500; color: var(--muted); margin-bottom: 12px; }
+
+  /* ── Result blocks ── */
+  .result-conclusion {
+    background: var(--card); border: 1px solid var(--border); border-radius: 16px;
+    padding: 20px; margin-bottom: 10px;
+  }
+  .result-label { font-size: 11px; font-weight: 600; margin-bottom: 6px; display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+  .result-text { font-size: 18px; font-weight: 700; line-height: 1.4; color: var(--text); }
+  .result-personal { margin-top: 10px; font-size: 13px; color: var(--sage); font-weight: 500; padding: 8px 12px; background: var(--sage-pale); border-radius: 8px; }
+
+  .result-block {
+    background: var(--card); border: 1px solid var(--border); border-radius: 16px;
+    padding: 18px; margin-bottom: 10px;
+  }
+  .result-block-title { font-size: 11px; font-weight: 600; color: var(--muted); margin-bottom: 10px; display: flex; align-items: center; gap: 6px; }
+  .bullet-list { list-style: none; }
+  .bullet-list li { display: flex; align-items: flex-start; gap: 6px; font-size: 13px; margin-bottom: 6px; line-height: 1.5; }
+  .bullet-list li:last-child { margin-bottom: 0; }
+  .dot-sage { color: var(--sage); flex-shrink: 0; margin-top: 1px; }
+  .dot-terra { color: var(--terra); flex-shrink: 0; margin-top: 1px; }
+
+  .fit-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px; }
+  .fit-box { border-radius: 12px; padding: 14px; }
+  .fit-box.yes { background: var(--sage-pale); border: 1px solid var(--sage-border); }
+  .fit-box.no  { background: var(--terra-pale); border: 1px solid var(--terra-border); }
+  .fit-box-title { font-size: 11px; font-weight: 600; margin-bottom: 8px; }
+  .fit-box.yes .fit-box-title { color: #3D6B40; }
+  .fit-box.no  .fit-box-title { color: var(--terra-dark); }
+  .fit-item { font-size: 12px; line-height: 1.5; margin-bottom: 4px; }
+  .fit-box.yes .fit-item { color: #3D6B40; }
+  .fit-box.no  .fit-item { color: var(--terra-dark); }
+
+  .next-box {
+    background: var(--subtle); border: 1px solid var(--border); border-radius: 12px;
+    padding: 14px 16px; margin-bottom: 10px;
+  }
+  .next-box-title { font-size: 11px; font-weight: 600; color: var(--muted); margin-bottom: 4px; }
+  .next-box-text { font-size: 13px; font-weight: 500; color: var(--text); }
+
+  /* comparison table */
+  .cmp-table { border-radius: 12px; overflow: hidden; border: 1px solid var(--border); margin-bottom: 10px; }
+  .cmp-head { display: grid; grid-template-columns: 80px 1fr 1fr; background: var(--subtle); padding: 10px 14px; }
+  .cmp-head span { font-size: 11px; font-weight: 600; color: var(--muted); }
+  .cmp-row { display: grid; grid-template-columns: 80px 1fr 1fr; padding: 10px 14px; border-top: 1px solid #F0EBE3; }
+  .cmp-row:nth-child(even) { background: #FAFAF8; }
+  .cmp-row:nth-child(odd) { background: var(--card); }
+  .cmp-dim { font-size: 11px; font-weight: 600; color: var(--muted); }
+  .cmp-cell { font-size: 12px; line-height: 1.5; color: var(--text); }
+
+  .reliability-box {
+    background: var(--subtle); border: 1px solid var(--border); border-radius: 12px;
+    padding: 12px 14px; margin-bottom: 10px;
+  }
+
+  /* related */
+  .related-btn {
+    display: block; width: 100%; background: var(--card); border: 1px solid var(--border);
+    border-radius: 10px; padding: 10px 14px; text-align: left; font-size: 13px;
+    font-family: inherit; color: var(--text); cursor: pointer; margin-bottom: 6px;
+    transition: border-color .15s;
+  }
+  .related-btn:hover { border-color: var(--sage); }
+
+  /* loading skeleton */
+  .skeleton {
+    border-radius: 16px; background: var(--card); border: 1px solid var(--border);
+    height: 72px; margin-bottom: 10px; animation: pulse 1.4s ease-in-out infinite;
+  }
+  @keyframes pulse {
+    0%, 100% { opacity: 1; } 50% { opacity: .5; }
+  }
+  .loading-hint { text-align: center; font-size: 12px; color: var(--light); margin-top: 6px; }
+
+  /* error */
+  .error-box {
+    background: var(--terra-pale); border: 1px solid var(--terra-border);
+    border-radius: 16px; padding: 20px; text-align: center;
+  }
+  .error-box p { font-size: 13px; color: var(--terra); margin-bottom: 12px; }
+  .retry-btn {
+    border: 1px solid var(--terra); color: var(--terra); background: none;
+    border-radius: 99px; padding: 6px 16px; font-size: 13px; cursor: pointer; font-family: inherit;
+  }
+
+  /* save button */
+  .save-btn {
+    border-radius: 99px; border: 1px solid var(--border); color: var(--muted);
+    background: none; padding: 6px 14px; font-size: 13px; cursor: pointer; font-family: inherit;
+    transition: all .15s;
+  }
+  .save-btn.saved { border-color: var(--sage); color: var(--sage); background: var(--sage-pale); }
+
+  /* hero */
+  .hero { text-align: center; padding: 48px 0 32px; }
+  .hero h1 { font-size: 22px; font-weight: 700; line-height: 1.4; margin-bottom: 8px; }
+  .hero p { font-size: 13px; color: var(--muted); margin-bottom: 28px; }
+
+  /* guide page */
+  .guide-intro {
+    background: var(--sage-pale); border: 1px solid var(--sage-border);
+    border-radius: 14px; padding: 14px 16px; margin-bottom: 18px;
+  }
+  .guide-intro p { font-size: 13px; line-height: 1.6; color: #3D6B40; }
+  .guide-q-btn {
+    display: flex; align-items: center; justify-content: space-between; gap: 10px;
+    width: 100%; background: var(--card); border: 1px solid var(--border); border-radius: 14px;
+    padding: 14px 16px; text-align: left; font-family: inherit; cursor: pointer;
+    margin-bottom: 8px; transition: border-color .15s;
+  }
+  .guide-q-btn:hover { border-color: var(--sage); }
+  .guide-q-text { font-size: 13px; font-weight: 500; color: var(--text); }
+  .guide-q-arrow { font-size: 13px; color: var(--sage); flex-shrink: 0; }
+
+  /* saved page */
+  .saved-empty { text-align: center; padding: 80px 0; }
+  .saved-empty p { color: var(--muted); margin-bottom: 8px; }
+  .saved-empty small { color: var(--light); font-size: 12px; }
+  .go-search-btn {
+    display: inline-block; margin-top: 20px; background: var(--sage); color: #fff;
+    border: none; border-radius: 99px; padding: 10px 22px; font-size: 13px;
+    font-weight: 500; cursor: pointer; font-family: inherit;
+  }
+  .saved-item {
+    display: flex; align-items: center; justify-content: space-between; gap: 10px;
+    background: var(--card); border: 1px solid var(--border); border-radius: 14px;
+    padding: 12px 14px; margin-bottom: 8px;
+  }
+  .saved-item-q { font-size: 13px; color: var(--text); cursor: pointer; flex: 1; }
+  .saved-item-q:hover { color: var(--sage); }
+  .remove-btn { font-size: 12px; color: var(--light); background: none; border: none; cursor: pointer; }
+
+  /* question type badge */
+  .type-badge { display: inline-block; margin-bottom: 8px; }
+
+  /* ── Analysis page: dimension selector ── */
+  .dim-section {
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 16px; padding: 16px 18px; margin-bottom: 14px;
+  }
+  .dim-section-title { font-size: 11px; font-weight: 600; color: var(--muted); margin-bottom: 12px; }
+  .dim-group { margin-bottom: 12px; }
+  .dim-group:last-child { margin-bottom: 0; }
+  .dim-group-label { font-size: 12px; color: var(--muted); margin-bottom: 6px; }
+  .dim-opts { display: flex; flex-wrap: wrap; gap: 6px; }
+  .dim-opt {
+    border: 1px solid var(--border); border-radius: 99px; padding: 5px 12px;
+    font-size: 12px; color: var(--muted); background: var(--bg); cursor: pointer;
+    font-family: inherit; transition: all .15s;
+  }
+  .dim-opt:hover { border-color: var(--sage); color: var(--sage); }
+  .dim-opt.active { border-color: var(--sage); color: var(--sage); background: var(--sage-pale); font-weight: 500; }
+
+  /* ── Dim section footer buttons ── */
+  .dim-footer {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-top: 16px; padding-top: 12px; border-top: 1px solid var(--border);
+  }
+  .dim-confirm-btn {
+    background: var(--sage); color: #fff; border: none;
+    border-radius: 99px; padding: 8px 22px;
+    font-size: 13px; font-weight: 600; cursor: pointer; font-family: inherit;
+    transition: opacity .15s;
+  }
+  .dim-confirm-btn:hover { opacity: .88; }
+  .dim-skip-btn {
+    background: none; border: 1px solid var(--border);
+    border-radius: 99px; padding: 8px 18px;
+    font-size: 13px; color: var(--muted); cursor: pointer; font-family: inherit;
+    transition: border-color .15s, color .15s;
+  }
+  .dim-skip-btn:hover { border-color: var(--sage); color: var(--sage); }
+
+  /* ── Dim waiting placeholder ── */
+  .dim-waiting {
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 16px; padding: 32px 20px;
+    text-align: center; color: var(--light); font-size: 13px;
+    margin-bottom: 10px; line-height: 1.7;
+  }
+
+  /* ── Source badge ── */
+  .source-badge {
+    font-size: 10px; font-weight: 400; border-radius: 4px; padding: 2px 6px;
+    background: #F0EBE3; color: var(--muted);
+  }
+  .source-badge.curated { background: #E4F0E5; color: #3D6B40; }
+
+  /* ── Goal page ── */
+  .goal-rec-title { font-size: 12px; font-weight: 600; color: var(--muted); margin-bottom: 10px; margin-top: 4px; }
+  .goal-rec-card {
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 14px; padding: 14px 16px; margin-bottom: 8px;
+    display: flex; align-items: center; justify-content: space-between; gap: 10px;
+    cursor: pointer; font-size: 14px; font-weight: 500; color: var(--text);
+    font-family: inherit; text-align: left; width: 100%;
+    transition: border-color .15s, box-shadow .15s;
+  }
+  .goal-rec-card:hover { border-color: var(--sage); box-shadow: 0 2px 10px rgba(0,0,0,.07); }
+  .goal-rec-arrow { color: var(--sage-light); font-size: 15px; flex-shrink: 0; }
+  .goal-dim-waiting {
+    background: var(--subtle); border: 1px solid var(--border);
+    border-radius: 12px; padding: 24px 20px;
+    text-align: center; font-size: 13px; color: var(--light); line-height: 1.8;
+  }
+  .goal-more-btn {
+    display: block; width: 100%; text-align: center;
+    background: none; border: 1px dashed var(--border); border-radius: 12px;
+    padding: 11px; font-size: 13px; color: var(--muted); cursor: pointer;
+    font-family: inherit; margin-top: 4px; transition: border-color .15s, color .15s;
+  }
+  .goal-more-btn:hover { border-color: var(--sage); color: var(--sage); }
+
+  /* ── New analysis format ── */
+  .opening-card {
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 16px; padding: 20px 24px; margin-bottom: 10px;
+  }
+  .opening-text { font-size: 15px; line-height: 1.9; color: var(--text); }
+
+  .angles-card {
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 16px; overflow: hidden; margin-bottom: 10px;
+  }
+  .angle-item { padding: 20px 24px; }
+  .angle-item + .angle-item { border-top: 1px solid #F0EBE3; }
+  .angle-header { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
+  .angle-num {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 24px; height: 24px; border-radius: 50%;
+    font-size: 12px; font-weight: 700; flex-shrink: 0;
+  }
+  .angle-num-sage { background: var(--sage-pale); color: var(--sage); }
+  .angle-num-terra { background: var(--terra-pale); color: var(--terra); }
+  .angle-title { font-size: 14px; font-weight: 600; color: var(--text); }
+  .angle-content { font-size: 13px; line-height: 1.9; color: #4A4744; padding-left: 36px; }
+
+  .verdict-card { border-radius: 16px; padding: 20px 24px; margin-bottom: 10px; }
+  .verdict-card.sage { background: var(--sage-pale); border: 1px solid var(--sage-border); }
+  .verdict-card.terra { background: var(--terra-pale); border: 1px solid var(--terra-border); }
+  .verdict-label { font-size: 11px; font-weight: 600; margin-bottom: 8px; }
+  .verdict-card.sage .verdict-label { color: #3D6B40; }
+  .verdict-card.terra .verdict-label { color: var(--terra-dark); }
+  .verdict-text { font-size: 15px; font-weight: 600; line-height: 1.6; color: var(--text); }
+
+  /* ── Action steps ── */
+  .step-list { list-style: none; counter-reset: step-counter; }
+  .step-item {
+    display: flex; align-items: flex-start; gap: 12px; margin-bottom: 14px;
+    padding: 14px 16px; background: var(--card); border: 1px solid var(--border);
+    border-radius: 12px;
+  }
+  .step-item:last-child { margin-bottom: 0; }
+  .step-num {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 26px; height: 26px; border-radius: 50%; flex-shrink: 0;
+    background: #EBF3FB; color: #4A90D9; font-size: 13px; font-weight: 700;
+  }
+  .step-text { font-size: 13px; line-height: 1.8; color: #4A4744; flex: 1; }
+  .keypoint-list { list-style: none; }
+  .keypoint-list li { display: flex; align-items: flex-start; gap: 6px; font-size: 13px; margin-bottom: 6px; line-height: 1.5; }
+  .keypoint-list li:last-child { margin-bottom: 0; }
+  .dot-blue { color: #4A90D9; flex-shrink: 0; margin-top: 1px; }
+  .resource-card {
+    background: #EBF3FB; border: 1px solid #B8D4F0;
+    border-radius: 12px; padding: 14px 16px; margin-bottom: 10px;
+  }
+  .resource-card-title { font-size: 11px; font-weight: 600; color: #4A90D9; margin-bottom: 8px; }
+  .resource-item { font-size: 12px; line-height: 1.5; margin-bottom: 4px; color: #2D6CB4; }
+</style>
+</head>
+<body>
+
+<!-- ════════════════ 首页 ════════════════ -->
+<div id="page-home" class="page active">
+  <nav>
+    <span class="nav-brand">瑜伽普拉提分析师</span>
+    <div style="display:flex;gap:8px">
+      <button class="btn-ghost" onclick="showSaved()">收藏</button>
+    </div>
+  </nav>
+  <div class="container">
+    <div class="hero">
+      <h1>帮你判断学什么、怎么选、怎么做</h1>
+      <p>瑜伽普拉提行业搜索引擎 + AI 分析师</p>
+      <div class="search-wrap">
+        <input id="home-input" class="search-input" placeholder="输入问题或关键词，例如：普拉提证书"
+          onkeydown="if(event.key==='Enter')doSearch(this.value)">
+        <button class="search-btn" onclick="doSearch(document.getElementById('home-input').value)">搜索</button>
+      </div>
+      <div class="quick-list" id="quick-list"></div>
+    </div>
+
+    <div class="goal-grid" id="goal-grid"></div>
+
+    <div class="sec-title">常见决策问题</div>
+    <div id="topic-list"></div>
+  </div>
+</div>
+
+<!-- ════════════════ 目标引导页 ════════════════ -->
+<div id="page-goal" class="page">
+  <nav>
+    <div class="nav-left">
+      <button class="btn-ghost" onclick="goBack()">← 返回</button>
+      <span class="nav-brand">瑜伽普拉提分析师</span>
+    </div>
+  </nav>
+  <div class="container">
+    <div style="margin-bottom:20px">
+      <div id="goal-page-chip" style="margin-bottom:8px"></div>
+      <h1 id="goal-page-title" style="font-size:22px;font-weight:700;line-height:1.4;margin-bottom:6px"></h1>
+      <p id="goal-page-desc" style="font-size:13px;color:var(--muted)"></p>
+    </div>
+    <div id="goal-page-dims"></div>
+    <div id="goal-page-result"></div>
+  </div>
+</div>
+
+<!-- ════════════════ 分析页（引导+结果合并）════════════════ -->
+<div id="page-analysis" class="page">
+  <nav>
+    <div class="nav-left">
+      <button class="btn-ghost" onclick="goBack()">← 返回</button>
+      <span class="nav-brand">瑜伽普拉提分析师</span>
+    </div>
+    <button id="analysis-save-btn" class="save-btn" onclick="toggleSave('analysis')">收藏</button>
+  </nav>
+  <div class="container">
+    <div style="margin-bottom:16px">
+      <div style="font-size:12px;color:var(--muted);margin-bottom:4px">正在分析：</div>
+      <h1 id="analysis-query" style="font-size:20px;font-weight:700;line-height:1.4"></h1>
+    </div>
+    <div id="analysis-dims"></div>
+    <div id="analysis-result"></div>
+  </div>
+</div>
+
+<!-- ════════════════ 选择判断型结果页 ════════════════ -->
+<div id="page-judgment" class="page">
+  <nav>
+    <div class="nav-left">
+      <button class="btn-ghost" onclick="goBack()">← 返回</button>
+      <span class="nav-brand">瑜伽普拉提分析师</span>
+    </div>
+    <button id="judgment-save-btn" class="save-btn" onclick="toggleSave('judgment')">收藏</button>
+  </nav>
+  <div class="container">
+    <div style="margin-bottom:20px">
+      <span class="chip chip-sage type-badge">选择判断</span>
+      <h1 id="judgment-query" style="font-size:20px;font-weight:700;line-height:1.4"></h1>
+    </div>
+    <div id="judgment-content"></div>
+  </div>
+</div>
+
+<!-- ════════════════ 对比评估型结果页 ════════════════ -->
+<div id="page-comparison" class="page">
+  <nav>
+    <div class="nav-left">
+      <button class="btn-ghost" onclick="goBack()">← 返回</button>
+      <span class="nav-brand">瑜伽普拉提分析师</span>
+    </div>
+    <button id="comparison-save-btn" class="save-btn" onclick="toggleSave('comparison')">收藏</button>
+  </nav>
+  <div class="container">
+    <div style="margin-bottom:20px">
+      <span class="chip chip-terra type-badge">对比评估</span>
+      <h1 id="comparison-query" style="font-size:20px;font-weight:700;line-height:1.4"></h1>
+    </div>
+    <div id="comparison-content"></div>
+  </div>
+</div>
+
+<!-- ════════════════ 方法行动型结果页 ════════════════ -->
+<div id="page-action" class="page">
+  <nav>
+    <div class="nav-left">
+      <button class="btn-ghost" onclick="goBack()">← 返回</button>
+      <span class="nav-brand">瑜伽普拉提分析师</span>
+    </div>
+    <button id="action-save-btn" class="save-btn" onclick="toggleSave('action')">收藏</button>
+  </nav>
+  <div class="container">
+    <div style="margin-bottom:20px">
+      <span class="chip chip-blue type-badge">方法行动</span>
+      <h1 id="action-query" style="font-size:20px;font-weight:700;line-height:1.4"></h1>
+    </div>
+    <div id="action-content"></div>
+  </div>
+</div>
+
+<!-- ════════════════ 收藏页 ════════════════ -->
+<div id="page-saved" class="page">
+  <nav>
+    <div class="nav-left">
+      <button class="btn-ghost" onclick="goBack()">← 返回</button>
+      <span class="nav-brand">我的收藏</span>
+    </div>
+  </nav>
+  <div class="container">
+    <div id="saved-content"></div>
+  </div>
+</div>
+
+<script>
+// ═══════════════════════════════════════
+// 配置
+// ═══════════════════════════════════════
+const GLM_KEY   = "12040b93d97845f6a95a3de1f5b3ede1.iOMcEeYMvM0AS3wQ";
+const GLM_URL   = "https://open.bigmodel.cn/api/paas/v4/chat/completions";
+const GLM_MODEL = "glm-4.7-flash";
+
+// ═══════════════════════════════════════
+// 数据
+// ═══════════════════════════════════════
+const QUICK_QUESTIONS = [
+  "第一张证书怎么选", "普拉提和瑜伽哪个更好入行",
+  "零基础能转行吗", "解剖修复值得学吗",
+  "考完证怎么找工作", "如何让学员持续续费",
+];
+
+const GOAL_ENTRIES = [
+  { label:"想入行",   desc:"从零开始，找到最适合自己的入行路径", color:"sage",  goalId:"入行" },
+  { label:"想进阶",   desc:"已经入行，找到下一步值得深入的方向", color:"terra", goalId:"进阶" },
+  { label:"想赚到钱", desc:"已经在教课，如何提高收入和续课率",   color:"text",  goalId:"赚钱" },
+];
+
+// ═══════════════════════════════════════
+// 目标引导定义
+// ═══════════════════════════════════════
+const GOAL_DEFS = {
+  "入行": {
+    label: "想入行", desc: "从零开始，找到最适合自己的入行路径", color: "sage",
+    dims: [
+      { id:"base",   label:"你目前的基础？",   options:["完全零基础","有瑜伽/运动基础"] },
+      { id:"time",   label:"你的时间安排？",   options:["全职学习","利用业余时间"] },
+      { id:"budget", label:"你的学习预算？",   options:["1万以内","1-3万","3万以上"] },
+    ],
+    recommend(dims) {
+      if (!dims.base || dims.base === "完全零基础") {
+        return ["第一张证书怎么选", "零基础能转行吗", "培训机构到底该怎么比较"];
+      } else {
+        return ["普拉提证书哪个机构更值得", "培训机构到底该怎么比较", "普拉提和瑜伽哪个更好入行"];
+      }
+    }
+  },
+  "进阶": {
+    label: "想进阶", desc: "已经入行，找到下一步值得深入的方向", color: "terra",
+    dims: [
+      { id:"exp",       label:"你的教学经验？",   options:["1年以内","1-3年","3年以上"] },
+      { id:"direction", label:"你想深入的方向？", options:["证书升级","解剖修复专项","商业运营"] },
+    ],
+    recommend(dims) {
+      const dir = dims.direction;
+      if (dir === "证书升级") {
+        return ["普拉提证书哪个机构更值得", "国内外普拉提证书有什么区别"];
+      } else if (dir === "解剖修复专项") {
+        return ["解剖修复方向值不值得学", "解剖修复更适合新手还是进阶老师"];
+      } else {
+        return ["私教老师如何做销售不显得硬推销", "如何让学员持续续费"];
+      }
+    }
+  },
+  "赚钱": {
+    label: "想赚到钱", desc: "已经在教课，如何提高收入和续课率", color: "text",
+    dims: [
+      { id:"venue", label:"你主要在哪里教课？", options:["健身房/工作室","上门私教","自营场地"] },
+      { id:"pain",  label:"你目前最大的瓶颈？", options:["找到/吸引学员","提高续费率","提高定价底气"] },
+    ],
+    recommend(dims) {
+      const pain = dims.pain;
+      if (pain === "找到/吸引学员") {
+        return ["私教老师如何做销售不显得硬推销", "如何让潜在学员自然产生兴趣报课"];
+      } else if (pain === "提高续费率") {
+        return ["课堂结束后如何说更容易让学员续费", "续费率低应该重点改善什么"];
+      } else {
+        return ["解剖修复方向值不值得学", "如何让学员真正感受到课程价值"];
+      }
+    }
+  }
+};
+
+// P0 高频 topic：预写底座 + AI 个性化 + 维度选项
+const TOPICS = [
+  {
+    id:"pilates-cert", goals:["入行","进阶"], label:"普拉提证书",
+    intro:"普拉提证书相关问题，通常涉及证书选择、机构对比和实际就业价值判断。",
+    tags:["证书选择","入行判断"],
+    dimensions: [
+      { id:"city",   label:"你在哪个城市级别？",   options:["一线城市","二线城市","三线及以下"] },
+      { id:"budget", label:"你的学习预算？",         options:["1万以内","1-3万","3万以上"] },
+      { id:"stage",  label:"你目前的阶段？",         options:["完全零基础","有瑜伽/运动基础","已有其他证书"] }
+    ],
+    base: {
+      conclusion: "国内普拉提市场人才缺口大，证书是进入正规场所的敲门砖，但认证体系差距明显，要选对。",
+      basis: [
+        "正规健身房和精品工作室普遍要求持证上岗，无证书难以入职",
+        "普拉提在国内渗透率仍低，师资供给不足，竞争压力小于瑜伽市场",
+        "不同认证体系含金量差距大，BASI / STOTT 等国际认证更受市场认可"
+      ],
+      source: "行业整理 · Boss直聘招聘数据 + 从业者访谈"
+    },
+    questions: ["第一张普拉提证书怎么选","普拉提证书哪个机构更值得","普拉提证书对找工作帮助有多大","国内外普拉提证书有什么区别"]
+  },
+  {
+    id:"first-cert", goals:["入行"], label:"第一张证书",
+    intro:"第一张证书相关问题，核心是判断当前阶段更适合从哪类学习路径开始。",
+    tags:["证书选择","入行判断","零基础"],
+    dimensions: [
+      { id:"background", label:"你的运动基础？",   options:["零基础","有瑜伽基础","有普拉提基础"] },
+      { id:"goal",       label:"你的主要目标？",   options:["尽快就业","系统学习","副业转行"] },
+      { id:"time",       label:"你的时间安排？",   options:["全职学习","利用业余时间"] }
+    ],
+    base: {
+      conclusion: "第一张证书建议选国内认可度高、学习周期合理的课程，打底比求高档更重要。",
+      basis: [
+        "国内市场更看重实教经验而非证书层级，第一张证书主要解决「入门资格」问题",
+        "高价国际认证作为第一张证书性价比低，适合有一定基础后再考虑",
+        "学习周期过短（如纯周末集训班）技术积累通常不足，影响后续就业竞争力"
+      ],
+      source: "行业整理 · 从业者调研"
+    },
+    questions: ["零基础入行，第一张证书该怎么选","先学瑜伽还是普拉提更好入行","第一张证书需要考哪些内容","新手容易踩的证书误区有哪些"]
+  },
+  {
+    id:"anatomy", goals:["入行","进阶","赚钱"], label:"解剖修复",
+    intro:"解剖修复相关问题，通常在判断是否值得学、适合什么阶段学、对私教收入有无帮助。",
+    tags:["课程选择","学习方向进阶"],
+    dimensions: [
+      { id:"experience", label:"你的教学经验？",   options:["还未开始教课","1年以内","1-3年","3年以上"] },
+      { id:"direction",  label:"你的教学方向？",   options:["团课为主","私教为主","两者都做"] }
+    ],
+    base: {
+      conclusion: "解剖修复方向溢价明显，但适合有1-2年教学经验后切入，新手阶段投入性价比低。",
+      basis: [
+        "解剖修复私教定价普遍高于普通课程1.5-2倍，有明显收入天花板优势",
+        "但学员基础要求高，新手老师招募该类学员难度大，容易陷入有能力无生源的困境",
+        "建议先积累稳定学员基础，再将修复方向作为高端产品线切入"
+      ],
+      source: "行业整理 · 从业者分享"
+    },
+    questions: ["解剖修复方向值不值得学","解剖修复更适合新手还是进阶老师","解剖修复和普通普拉提有什么区别","各类解剖修复课程怎么比较"]
+  },
+  {
+    id:"studio", goals:["入行","进阶","赚钱"], label:"培训机构",
+    intro:"培训机构相关问题，通常在比较课程内容、师资、认证价值和后续就业支持。",
+    tags:["培训机构评估","入行判断"],
+    dimensions: [
+      { id:"mode",   label:"你倾向哪种学习方式？",   options:["线下集中学习","线上课程","线下+线上结合"] },
+      { id:"budget", label:"你的预算范围？",           options:["1万以内","1-3万","3万以上"] }
+    ],
+    base: {
+      conclusion: "选培训机构核心看三点：证书含金量、实习教学安排、毕业后就业支持。价格不代表质量。",
+      basis: [
+        "头部机构的优势在于证书市场认可度和校友网络，而非课程内容绝对独特",
+        "大量机构以高价营造品质感，但缺乏真实教学实践安排，学完没机会教",
+        "毕业后能否介绍实习或就业机会，是区分好机构和普通机构的关键指标"
+      ],
+      source: "行业整理 · 学员反馈汇总"
+    },
+    questions: ["培训机构到底该怎么比较","哪类培训机构更适合新手","选机构时哪些指标值得重点看","高价机构和普通机构差别到底在哪"]
+  },
+  {
+    id:"sales", goals:["赚钱"], label:"销售开课",
+    intro:"销售开课相关问题，核心是如何让专业能力自然建立信任和转化，而不是硬推销。",
+    tags:["销售开课","收入提升"],
+    dimensions: [
+      { id:"venue", label:"你主要在哪里教课？",     options:["健身房/工作室","上门私教","自己的场地"] },
+      { id:"issue", label:"你目前最大的销售困难？", options:["开口困难","报价被拒","不知道怎么跟进"] }
+    ],
+    base: {
+      conclusion: "私教销售的核心是建立信任，而非推课。课前体验和价值感知比话术有效3倍以上。",
+      basis: [
+        "学员购课的核心驱动是「信任这个老师能帮助我」，而非价格便宜",
+        "硬推销会触发防御心理，尤其是有消费经验的中高端学员，反而降低转化",
+        "提供1次免费或低价体验课后再报价，转化率通常显著高于直接推销"
+      ],
+      source: "行业整理 · 销售经验参考"
+    },
+    questions: ["私教老师如何做销售不显得硬推销","如何让潜在学员自然产生兴趣报课","新手老师容易踩的销售误区有哪些","销售能力差会影响哪些结果"]
+  },
+  {
+    id:"retention", goals:["赚钱"], label:"续费",
+    intro:"续费相关问题，核心是如何通过课堂体验、价值表达和持续陪伴，让学员自然愿意继续。",
+    tags:["续费转化","收入提升"],
+    dimensions: [
+      { id:"rate",  label:"你目前的续费率大概？", options:["不到30%","30%-60%","60%以上"] },
+      { id:"venue", label:"你主要在哪里教课？",   options:["健身房","精品工作室","自营/上门"] }
+    ],
+    base: {
+      conclusion: "续费率低通常不是因为「价格太贵」，而是学员感受不到进步或情感连接断了。",
+      basis: [
+        "学员续费的首要原因：感受到身体变化、信任老师、课堂体验好——三者缺一会影响续费",
+        "续费率低的常见原因：缺乏课后跟进，学员不清楚自己进步了多少",
+        "定期向学员反馈进步（哪怕是细小变化），可以显著提升续费意愿和忠诚度"
+      ],
+      source: "行业整理 · 从业者经验"
+    },
+    questions: ["课堂结束后如何说更容易让学员续费","续费率低应该重点改善什么","哪些表达方式容易让学员产生厌烦","如何让学员真正感受到课程价值"]
+  },
+];
+
+// ═══════════════════════════════════════
+// 路由逻辑
+// ═══════════════════════════════════════
+const COMPARISON_KW = ["还是","区别","对比","哪个好","哪个更好","哪个更适合","哪个","差别","分别","好还是"];
+const JUDGMENT_KW   = ["值不值","要不要","好不好","值得","应不应该","该不该","适不适合","有没有必要","有用吗","值得吗","应该吗","需要吗","必要吗","有帮助吗"];
+const ACTION_KW     = ["怎么","如何","怎样","怎么做","第一步","步骤","流程","方法","如何提高","如何找","如何开始","怎么开始"];
+
+function detectType(q) {
+  if (q.length <= 8 && !COMPARISON_KW.concat(JUDGMENT_KW, ACTION_KW).some(k => q.includes(k))) return "fuzzy";
+  if (COMPARISON_KW.some(k => q.includes(k))) return "comparison";
+  if (JUDGMENT_KW.some(k => q.includes(k)))   return "judgment";
+  if (ACTION_KW.some(k => q.includes(k)))     return "action";
+  return "fuzzy";
+}
+
+// ═══════════════════════════════════════
+// 状态
+// ═══════════════════════════════════════
+let currentPage  = "home";
+let currentQuery = "";
+let pageHistory  = [];
+let analysisDims = {};   // { dimId: selectedValue }
+
+// ═══════════════════════════════════════
+// 页面切换
+// ═══════════════════════════════════════
+function showPage(id) {
+  document.querySelectorAll(".page").forEach(p => p.classList.remove("active"));
+  document.getElementById("page-" + id).classList.add("active");
+  window.scrollTo(0, 0);
+  pageHistory.push(currentPage);
+  currentPage = id;
+}
+
+function goBack() {
+  const prev = pageHistory.pop() || "home";
+  document.querySelectorAll(".page").forEach(p => p.classList.remove("active"));
+  document.getElementById("page-" + prev).classList.add("active");
+  window.scrollTo(0, 0);
+  currentPage = prev;
+}
+
+function showSaved() { renderSaved(); showPage("saved"); }
+
+// ═══════════════════════════════════════
+// 搜索入口
+// ═══════════════════════════════════════
+function doSearch(q) {
+  q = q.trim();
+  if (!q) return;
+  currentQuery = q;
+  const type = detectType(q);
+  if (type === "fuzzy")           showAnalysis(q);
+  else if (type === "comparison") showComparison(q);
+  else if (type === "action")     showAction(q);
+  else                            showJudgment(q);
+}
+
+// ═══════════════════════════════════════
+// GLM API
+// ═══════════════════════════════════════
+let _currentAbort = null;
+let _lastCallTime  = 0;
+const MIN_INTERVAL = 4000; // 两次请求之间最少间隔 4 秒，避免 429
+
+async function callGLM(messages) {
+  // 取消上一个正在进行的请求
+  if (_currentAbort) { _currentAbort.abort(); _currentAbort = null; }
+
+  // 距上次调用不足 MIN_INTERVAL，先等够再发
+  const now = Date.now();
+  const wait = MIN_INTERVAL - (now - _lastCallTime);
+  if (wait > 0) await new Promise(r => setTimeout(r, wait));
+
+  const controller = new AbortController();
+  _currentAbort = controller;
+  _lastCallTime  = Date.now();
+
+  let res;
+  try {
+    res = await fetch(GLM_URL, {
+      method: "POST",
+      signal: controller.signal,
+      headers: { "Content-Type": "application/json", "Authorization": "Bearer " + GLM_KEY },
+      body: JSON.stringify({ model: GLM_MODEL, messages, temperature: 0.7, max_tokens: 3000 }),
+    });
+  } catch(e) {
+    if (e.name === "AbortError") throw new Error("ABORTED");
+    throw e;
+  }
+
+  // 仍然 429：再等 5 秒重试一次
+  if (res.status === 429) {
+    await new Promise(r => setTimeout(r, 5000));
+    _lastCallTime = Date.now();
+    res = await fetch(GLM_URL, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", "Authorization": "Bearer " + GLM_KEY },
+      body: JSON.stringify({ model: GLM_MODEL, messages, temperature: 0.7, max_tokens: 3000 }),
+    });
+  }
+
+  if (!res.ok) throw new Error("API " + res.status);
+  const data = await res.json();
+  const raw = data.choices?.[0]?.message?.content ?? "";
+  console.log("AI raw response:", raw.substring(0, 500));
+  
+  let jsonStr = raw.trim();
+  const codeBlockMatch = raw.match(/```(?:json)?\s*([\s\S]*?)```/);
+  if (codeBlockMatch) {
+    jsonStr = codeBlockMatch[1].trim();
+  } else {
+    const braceMatch = raw.match(/\{[\s\S]*\}/);
+    if (braceMatch) {
+      jsonStr = braceMatch[0];
+    }
+  }
+  
+  try {
+    return JSON.parse(jsonStr);
+  } catch(parseErr) {
+    console.error("JSON parse failed. String to parse:", jsonStr.substring(0, 1000));
+    throw new Error("AI返回格式解析失败，请重试");
+  }
+}
+
+// ═══════════════════════════════════════
+// 目标引导页
+// ═══════════════════════════════════════
+let goalDimsSelected = {};
+
+function showGoalPage(goalId) {
+  const def = GOAL_DEFS[goalId];
+  goalDimsSelected = {};
+
+  // 标题与描述
+  const colorMap = { sage:"var(--sage)", terra:"var(--terra)", text:"var(--text)" };
+  const chipColorMap = { sage:"chip-sage", terra:"chip-terra", text:"" };
+  document.getElementById("goal-page-chip").innerHTML =
+    `<span class="chip ${chipColorMap[def.color] || 'chip-sage'}">${esc(def.label)}</span>`;
+  document.getElementById("goal-page-title").textContent = "告诉我你的情况";
+  document.getElementById("goal-page-desc").textContent = def.desc;
+
+  // 渲染维度
+  renderGoalDims(def);
+
+  // 等待提示
+  document.getElementById("goal-page-result").innerHTML =
+    `<div class="goal-dim-waiting">选好情况后点「帮我推荐」<br>我来为你匹配最合适的问题</div>`;
+
+  showPage("goal");
+}
+
+function renderGoalDims(def) {
+  const html = `
+    <div class="dim-section">
+      <div class="dim-section-title">选一选，推荐更精准</div>
+      ${def.dims.map(dim => `
+        <div class="dim-group">
+          <div class="dim-group-label">${esc(dim.label)}</div>
+          <div class="dim-opts">
+            ${dim.options.map(opt => `
+              <button class="dim-opt" onclick="selectGoalDim('${esc(dim.id)}','${esc(opt)}',this)">${esc(opt)}</button>
+            `).join("")}
+          </div>
+        </div>`).join("")}
+      <div class="dim-footer">
+        <button class="dim-confirm-btn" onclick="confirmGoalDims()">帮我推荐</button>
+        <button class="dim-skip-btn" onclick="skipGoalDims()">跳过，看全部</button>
+      </div>
+    </div>`;
+  document.getElementById("goal-page-dims").innerHTML = html;
+}
+
+function selectGoalDim(dimId, value, btn) {
+  const parent = btn.closest(".dim-opts");
+  const wasActive = btn.classList.contains("active");
+  parent.querySelectorAll(".dim-opt").forEach(b => b.classList.remove("active"));
+  if (!wasActive) {
+    btn.classList.add("active");
+    goalDimsSelected[dimId] = value;
+  } else {
+    delete goalDimsSelected[dimId];
+  }
+}
+
+function confirmGoalDims() {
+  // 找当前目标定义
+  const goalTitle = document.getElementById("goal-page-chip").querySelector(".chip").textContent;
+  const goalId = Object.keys(GOAL_DEFS).find(k => GOAL_DEFS[k].label === goalTitle);
+  const def = GOAL_DEFS[goalId];
+  const questions = def.recommend(goalDimsSelected);
+  renderGoalRecommendations(questions, def);
+  document.getElementById("goal-page-dims").innerHTML = "";
+}
+
+function skipGoalDims() {
+  const goalTitle = document.getElementById("goal-page-chip").querySelector(".chip").textContent;
+  const goalId = Object.keys(GOAL_DEFS).find(k => GOAL_DEFS[k].label === goalTitle);
+  const def = GOAL_DEFS[goalId];
+  // 跳过时展示该目标下所有 topic 的 questions
+  const allQuestions = TOPICS
+    .filter(t => t.goals && t.goals.includes(goalId))
+    .flatMap(t => t.questions || [])
+    .slice(0, 6);
+  renderGoalRecommendations(allQuestions, def);
+  document.getElementById("goal-page-dims").innerHTML = "";
+}
+
+function renderGoalRecommendations(questions, def) {
+  if (!questions || questions.length === 0) {
+    document.getElementById("goal-page-result").innerHTML =
+      `<div class="goal-dim-waiting">暂无推荐问题，可以直接搜索你想了解的内容</div>`;
+    return;
+  }
+  const cards = questions.map(q =>
+    `<button class="goal-rec-card" onclick="doSearch('${esc(q)}')">
+      <span>${esc(q)}</span>
+      <span class="goal-rec-arrow">→</span>
+    </button>`
+  ).join("");
+
+  // 「查看更多」展示该目标全部相关 topics
+  const goalId = Object.keys(GOAL_DEFS).find(k => GOAL_DEFS[k].label === def.label);
+  const relatedTopics = TOPICS.filter(t => t.goals && t.goals.includes(goalId));
+  const moreQuestions = relatedTopics.flatMap(t => t.questions || []).filter(q => !questions.includes(q));
+  const moreBlock = moreQuestions.length > 0
+    ? `<button class="goal-more-btn" onclick="toggleMoreQuestions(this,'${esc(goalId)}')">查看更多相关问题 ▾</button>
+       <div id="goal-more-list" style="display:none;margin-top:8px">
+         ${moreQuestions.slice(0,8).map(q =>
+           `<button class="goal-rec-card" onclick="doSearch('${esc(q)}')">
+             <span>${esc(q)}</span><span class="goal-rec-arrow">→</span>
+           </button>`).join("")}
+       </div>`
+    : "";
+
+  document.getElementById("goal-page-result").innerHTML = `
+    <div class="goal-rec-title">为你推荐的问题</div>
+    ${cards}
+    ${moreBlock}`;
+}
+
+function toggleMoreQuestions(btn, goalId) {
+  const list = document.getElementById("goal-more-list");
+  const open = list.style.display === "none";
+  list.style.display = open ? "" : "none";
+  btn.textContent = open ? "收起 ▴" : "查看更多相关问题 ▾";
+}
+
+// ═══════════════════════════════════════
+// 分析页（方案三：引导 + 结果合并）
+// ═══════════════════════════════════════
+function showAnalysis(q) {
+  document.getElementById("analysis-query").textContent = q;
+  document.getElementById("analysis-dims").innerHTML = "";
+  document.getElementById("analysis-result").innerHTML = "";
+  updateSaveBtn("analysis", q);
+  analysisDims = {};
+  showPage("analysis");
+
+  const topic = TOPICS.find(t => t.label === q || (t.questions && t.questions.some(tq => tq.includes(q))));
+
+  if (topic && topic.dimensions) {
+    // P0 topic：先渲染维度选择器，等用户确认/跳过后再调 AI
+    renderAnalysisDims(topic.dimensions);
+    document.getElementById("analysis-result").innerHTML =
+      `<div class="dim-waiting">选择上方维度后点击「确认开始分析」<br>也可以直接「跳过」查看通用分析</div>`;
+  } else {
+    // 长尾 topic：无预设维度，直接调 AI
+    document.getElementById("analysis-result").innerHTML = skeletonHTML(4);
+    loadAnalysisResult(q, {}, null);
+  }
+}
+
+function renderAnalysisDims(dimensions) {
+  if (!dimensions || dimensions.length === 0) return;
+  const html = `
+    <div class="dim-section">
+      <div class="dim-section-title">选一选，分析更精准</div>
+      ${dimensions.map(dim => `
+        <div class="dim-group">
+          <div class="dim-group-label">${esc(dim.label)}</div>
+          <div class="dim-opts">
+            ${dim.options.map(opt => `
+              <button class="dim-opt" onclick="selectDim('${esc(dim.id)}','${esc(opt)}',this)">${esc(opt)}</button>
+            `).join("")}
+          </div>
+        </div>`).join("")}
+      <div class="dim-footer">
+        <button class="dim-confirm-btn" onclick="confirmDims()">确认开始分析</button>
+        <button class="dim-skip-btn" onclick="skipDims()">跳过</button>
+      </div>
+    </div>`;
+  document.getElementById("analysis-dims").innerHTML = html;
+}
+
+function selectDim(dimId, value, btn) {
+  const parent = btn.closest(".dim-opts");
+  const wasActive = btn.classList.contains("active");
+  parent.querySelectorAll(".dim-opt").forEach(b => b.classList.remove("active"));
+  if (!wasActive) {
+    btn.classList.add("active");
+    analysisDims[dimId] = value;
+  } else {
+    delete analysisDims[dimId];
+  }
+  // 不自动触发 AI，等用户点确认或跳过
+}
+
+function confirmDims() {
+  const topic = TOPICS.find(t => t.label === currentQuery || (t.questions && t.questions.some(tq => tq.includes(currentQuery))));
+  // 隐藏维度选择器，展示加载状态
+  document.getElementById("analysis-dims").innerHTML = "";
+  document.getElementById("analysis-result").innerHTML = skeletonHTML(4);
+  loadAnalysisResult(currentQuery, analysisDims, topic || null);
+}
+
+function skipDims() {
+  const topic = TOPICS.find(t => t.label === currentQuery || (t.questions && t.questions.some(tq => tq.includes(currentQuery))));
+  document.getElementById("analysis-dims").innerHTML = "";
+  document.getElementById("analysis-result").innerHTML = skeletonHTML(4);
+  loadAnalysisResult(currentQuery, {}, topic || null);
+}
+
+async function loadAnalysisResult(q, dims, topic) {
+  document.getElementById("analysis-result").innerHTML = skeletonHTML(4);
+  const dimContext = Object.keys(dims).length > 0
+    ? `用户情况：${Object.values(dims).join("，")}。`
+    : "";
+
+  try {
+    let data;
+    let isP0 = false;
+
+    if (topic && topic.base) {
+      // P0：以权威底座数据为基础，AI 生成温暖风格的分析
+      isP0 = true;
+      const b = topic.base;
+      data = await callGLM([
+        { role:"system", content:"你是瑜伽普拉提行业顾问，以温暖专业的语气分析问题。回答必须是纯JSON格式，不要有任何额外文字、代码块标记或解释。" },
+        { role:"user",   content:`底座数据——结论：${b.conclusion}；依据：${b.basis.join("；")}。${dimContext}
+请基于以上数据回答"${q}"。
+要求：angles数组根据问题内容选择2-5个最关键的维度。
+直接输出JSON，格式如下：
+{"opening":"温暖开场3-4句话，带共情，200字以内","angles":[{"title":"维度名称","content":"详细分析200字以内"}],"verdict":"核心建议100字以内","related":["相关问题1","相关问题2","相关问题3"]}` }
+      ]);
+      data._sourceNote = b.source;
+    } else {
+      // 长尾：全 AI 生成
+      data = await callGLM([
+        { role:"system", content:"你是瑜伽普拉提行业顾问，以温暖专业的语气分析问题。回答必须是纯JSON格式，不要有任何额外文字、代码块标记或解释。" },
+        { role:"user",   content:`分析"${q}"。${dimContext}
+要求：angles数组根据问题内容选择2-5个最关键的维度。
+直接输出JSON，格式如下：
+{"opening":"温暖开场3-4句话，带共情，200字以内","angles":[{"title":"维度名称","content":"详细分析200字以内"}],"verdict":"核心建议100字以内","related":["相关问题1","相关问题2","相关问题3"]}` }
+      ]);
+      data._sourceNote = "AI 推断 · 仅供参考";
+    }
+
+    renderAnalysisResult(data, q, isP0);
+  } catch(e) {
+    if (e.message === "ABORTED") return; // 被新请求取消，忽略
+    console.error("loadAnalysisResult error:", e);
+    document.getElementById("analysis-result").innerHTML = errorHTML(e.message);
+  }
+}
+
+function buildAnglesHTML(data, color) {
+  const angles = Array.isArray(data.angles) ? data.angles : [];
+  if (angles.length === 0) return "";
+  const numClass = color === "terra" ? "angle-num-terra" : "angle-num-sage";
+  const items = angles.map((angle, i) => `
+    <div class="angle-item">
+      <div class="angle-header">
+        <span class="angle-num ${numClass}">${i + 1}</span>
+        <span class="angle-title">${esc(angle.title || "")}</span>
+      </div>
+      <p class="angle-content">${esc(angle.content || "")}</p>
+    </div>`).join("");
+  return `<div class="angles-card">${items}</div>`;
+}
+
+function renderAnalysisResult(data, q, isP0) {
+  const related = (data.related||[]).map(r => `<button class="related-btn" onclick="doSearch('${esc(r)}')">${esc(r)} →</button>`).join("");
+  const badgeClass = isP0 ? "source-badge curated" : "source-badge";
+  const sourceNote = data._sourceNote || (isP0 ? "行业整理" : "AI 推断");
+
+  document.getElementById("analysis-result").innerHTML = `
+    ${data.opening ? `<div class="opening-card"><p class="opening-text">${esc(data.opening)}</p></div>` : ""}
+    ${isP0 ? `<div style="margin-bottom:6px"><span class="${badgeClass}">${esc(sourceNote)}</span></div>` : ""}
+    ${buildAnglesHTML(data, "sage")}
+    ${data.verdict ? `<div class="verdict-card sage"><div class="verdict-label">我的建议</div><div class="verdict-text">${esc(data.verdict)}</div></div>` : ""}
+    ${related ? `<div class="sec-title" style="margin-top:16px">相关问题</div>${related}` : ""}`;
+}
+
+// ═══════════════════════════════════════
+// 判断型结果页
+// ═══════════════════════════════════════
+function showJudgment(q) {
+  document.getElementById("judgment-query").textContent = q;
+  document.getElementById("judgment-content").innerHTML = skeletonHTML(5);
+  updateSaveBtn("judgment", q);
+  showPage("judgment");
+
+  callGLM([
+    { role:"system", content:"你是瑜伽普拉提行业顾问，以温暖专业的语气分析问题。回答必须是纯JSON格式，不要有任何额外文字、代码块标记或解释。" },
+    { role:"user",   content:`分析"${q}"。
+直接输出JSON，格式如下：
+{"opening":"温暖开场3-4句话，带共情，200字以内","conclusion":"一句话明确结论","basis":["支撑依据1，200字以内","支撑依据2","支撑依据3"],"fits":["适合的情况1","适合的情况2","适合的情况3"],"notFits":["不适合的情况1","不适合的情况2"],"mistakes":["常见误区1","常见误区2"],"nextStep":"具体下一步建议200字以内","related":["相关问题1","相关问题2","相关问题3"]}` }
+  ]).then(data => renderJudgment(data, q)).catch((e) => {
+    console.error("showJudgment error:", e);
+    document.getElementById("judgment-content").innerHTML = errorHTML(e.message);
+  });
+}
+
+function renderJudgment(data, q) {
+  const related = (data.related||[]).map(r => `<button class="related-btn" onclick="doSearch('${esc(r)}')">${esc(r)} →</button>`).join("");
+  
+  const basisList = (data.basis||[]).map(b => `<li><span class="dot-sage">●</span>${esc(b)}</li>`).join("");
+  const fitsList = (data.fits||[]).map(f => `<div class="fit-item">${esc(f)}</div>`).join("");
+  const notFitsList = (data.notFits||[]).map(f => `<div class="fit-item">${esc(f)}</div>`).join("");
+  const mistakesList = (data.mistakes||[]).map(m => `<li><span class="dot-terra">●</span>${esc(m)}</li>`).join("");
+
+  document.getElementById("judgment-content").innerHTML = `
+    ${data.opening ? `<div class="opening-card"><p class="opening-text">${esc(data.opening)}</p></div>` : ""}
+    ${data.conclusion ? `<div class="result-conclusion"><div class="result-label"><span class="chip chip-sage">结论</span></div><div class="result-text">${esc(data.conclusion)}</div></div>` : ""}
+    ${basisList ? `<div class="result-block"><div class="result-block-title">📋 为什么这么说</div><ul class="bullet-list">${basisList}</ul></div>` : ""}
+    ${(fitsList || notFitsList) ? `<div class="fit-grid">
+      ${fitsList ? `<div class="fit-box yes"><div class="fit-box-title">✅ 适合</div>${fitsList}</div>` : ""}
+      ${notFitsList ? `<div class="fit-box no"><div class="fit-box-title">❌ 不适合</div>${notFitsList}</div>` : ""}
+    </div>` : ""}
+    ${mistakesList ? `<div class="result-block"><div class="result-block-title">⚠️ 常见误区</div><ul class="bullet-list">${mistakesList}</ul></div>` : ""}
+    ${data.nextStep ? `<div class="next-box"><div class="next-box-title">📍 下一步建议</div><div class="next-box-text">${esc(data.nextStep)}</div></div>` : ""}
+    ${related ? `<div class="sec-title" style="margin-top:16px">你可能还想问</div>${related}` : ""}`;
+}
+
+// ═══════════════════════════════════════
+// 对比型结果页
+// ═══════════════════════════════════════
+function showComparison(q) {
+  document.getElementById("comparison-query").textContent = q;
+  document.getElementById("comparison-content").innerHTML = skeletonHTML(5);
+  updateSaveBtn("comparison", q);
+  showPage("comparison");
+
+  callGLM([
+    { role:"system", content:"你是瑜伽普拉提行业顾问，以温暖专业的语气分析问题。回答必须是纯JSON格式，不要有任何额外文字、代码块标记或解释。" },
+    { role:"user",   content:`对比分析"${q}"。
+要求：dimensions数组根据问题内容选择2-6个最关键的对比维度。
+直接输出JSON，格式如下：
+{"opening":"温暖开场3-4句话，说明对比的核心取舍，200字以内","conclusion":"综合建议一句话","dimensions":[{"name":"维度名称","a":"选项A表现50字以内","b":"选项B表现50字以内"}],"risks":["风险提示1","风险提示2"],"reliability":"信息可靠度说明100字以内","related":["相关问题1","相关问题2"]}` }
+  ]).then(data => renderComparison(data, q)).catch((e) => {
+    console.error("showComparison error:", e);
+    document.getElementById("comparison-content").innerHTML = errorHTML(e.message);
+  });
+}
+
+function renderComparison(data, q) {
+  const related = (data.related||[]).map(r => `<button class="related-btn" onclick="doSearch('${esc(r)}')">${esc(r)} →</button>`).join("");
+  
+  const dimensions = Array.isArray(data.dimensions) ? data.dimensions : [];
+  const dimRows = dimensions.map(d => `
+    <div class="cmp-row">
+      <span class="cmp-dim">${esc(d.name || "")}</span>
+      <span class="cmp-cell">${esc(d.a || "")}</span>
+      <span class="cmp-cell">${esc(d.b || "")}</span>
+    </div>`).join("");
+  
+  const risksList = (data.risks||[]).map(r => `<li><span class="dot-terra">●</span>${esc(r)}</li>`).join("");
+
+  document.getElementById("comparison-content").innerHTML = `
+    ${data.opening ? `<div class="opening-card"><p class="opening-text">${esc(data.opening)}</p></div>` : ""}
+    ${data.conclusion ? `<div class="result-conclusion"><div class="result-label"><span class="chip chip-terra">综合建议</span></div><div class="result-text">${esc(data.conclusion)}</div></div>` : ""}
+    ${dimRows ? `<div class="result-block"><div class="result-block-title">📊 维度对比</div><div class="cmp-table"><div class="cmp-head"><span>维度</span><span>选项A</span><span>选项B</span></div>${dimRows}</div></div>` : ""}
+    ${risksList ? `<div class="result-block"><div class="result-block-title">⚠️ 需要注意</div><ul class="bullet-list">${risksList}</ul></div>` : ""}
+    ${data.reliability ? `<div class="reliability-box"><div class="result-block-title">📎 信息可靠度</div><div style="font-size:13px;color:var(--text);line-height:1.6">${esc(data.reliability)}</div></div>` : ""}
+    ${related ? `<div class="sec-title" style="margin-top:16px">你可能还想问</div>${related}` : ""}`;
+}
+
+// ═══════════════════════════════════════
+// 方法行动型结果页
+// ═══════════════════════════════════════
+function showAction(q) {
+  document.getElementById("action-query").textContent = q;
+  document.getElementById("action-content").innerHTML = skeletonHTML(5);
+  updateSaveBtn("action", q);
+  showPage("action");
+
+  callGLM([
+    { role:"system", content:"你是瑜伽普拉提行业顾问，以温暖专业的语气分析问题。回答必须是纯JSON格式，不要有任何额外文字、代码块标记或解释。" },
+    { role:"user",   content:`分析"${q}"，给出具体行动指引。
+要求：steps数组给出3-5个可执行步骤，每个步骤100字以内。
+直接输出JSON，格式如下：
+{"opening":"温暖开场3-4句话，共情+问题拆解，200字以内","steps":["步骤1：具体描述100字以内","步骤2：具体描述100字以内","步骤3：具体描述100字以内"],"keyPoints":["关键提醒1","关键提醒2"],"resources":["资源推荐1","资源推荐2"],"related":["相关问题1","相关问题2"]}` }
+  ]).then(data => renderAction(data, q)).catch((e) => {
+    console.error("showAction error:", e);
+    document.getElementById("action-content").innerHTML = errorHTML(e.message);
+  });
+}
+
+function renderAction(data, q) {
+  const related = (data.related||[]).map(r => `<button class="related-btn" onclick="doSearch('${esc(r)}')">${esc(r)} →</button>`).join("");
+  
+  const steps = Array.isArray(data.steps) ? data.steps : [];
+  const stepsHTML = steps.map((s, i) => `
+    <div class="step-item">
+      <span class="step-num">${i + 1}</span>
+      <div class="step-text">${esc(s)}</div>
+    </div>`).join("");
+  
+  const keyPointsList = (data.keyPoints||[]).map(k => `<li><span class="dot-blue">●</span>${esc(k)}</li>`).join("");
+  const resourcesList = (data.resources||[]).map(r => `<div class="resource-item">${esc(r)}</div>`).join("");
+
+  document.getElementById("action-content").innerHTML = `
+    ${data.opening ? `<div class="opening-card"><p class="opening-text">${esc(data.opening)}</p></div>` : ""}
+    ${stepsHTML ? `<div class="result-block"><div class="result-block-title">📍 行动步骤</div><div class="step-list">${stepsHTML}</div></div>` : ""}
+    ${keyPointsList ? `<div class="result-block"><div class="result-block-title">💡 关键提醒</div><ul class="keypoint-list">${keyPointsList}</ul></div>` : ""}
+    ${resourcesList ? `<div class="resource-card"><div class="resource-card-title">📚 资源推荐</div>${resourcesList}</div>` : ""}
+    ${related ? `<div class="sec-title" style="margin-top:16px">你可能还想问</div>${related}` : ""}`;
+}
+
+// ═══════════════════════════════════════
+// 收藏
+// ═══════════════════════════════════════
+function getSaved() { return JSON.parse(localStorage.getItem("yoga-saved") || "[]"); }
+function setSaved(list) { localStorage.setItem("yoga-saved", JSON.stringify(list)); }
+
+function toggleSave(page) {
+  const q = currentQuery;
+  let saved = getSaved();
+  if (saved.includes(q)) {
+    setSaved(saved.filter(s => s !== q));
+  } else {
+    setSaved([...saved, q]);
+  }
+  updateSaveBtn(page, q);
+}
+
+function updateSaveBtn(page, q) {
+  const btn = document.getElementById(page + "-save-btn");
+  if (!btn) return;
+  const isSaved = getSaved().includes(q);
+  btn.textContent = isSaved ? "已收藏 ✓" : "收藏";
+  btn.className = "save-btn" + (isSaved ? " saved" : "");
+}
+
+function renderSaved() {
+  const saved = getSaved();
+  const el = document.getElementById("saved-content");
+  if (saved.length === 0) {
+    el.innerHTML = `<div class="saved-empty">
+      <p>还没有收藏任何分析</p>
+      <small>在结果页点击"收藏"保存你觉得有用的分析</small>
+      <br><button class="go-search-btn" onclick="goBack()">去搜索</button>
+    </div>`;
+    return;
+  }
+  el.innerHTML = saved.map(q => `
+    <div class="saved-item">
+      <span class="saved-item-q" onclick="doSearch('${esc(q)}')">${esc(q)}</span>
+      <button class="remove-btn" onclick="removeSaved('${esc(q)}')">取消</button>
+    </div>`).join("");
+}
+
+function removeSaved(q) {
+  setSaved(getSaved().filter(s => s !== q));
+  renderSaved();
+}
+
+// ═══════════════════════════════════════
+// 工具函数
+// ═══════════════════════════════════════
+function esc(str) {
+  return String(str).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/'/g,"&#39;");
+}
+
+function skeletonHTML(n) {
+  return Array.from({length:n}, () => `<div class="skeleton"></div>`).join("") +
+    `<div class="loading-hint">AI 正在分析，通常需要 5-10 秒...</div>`;
+}
+
+function errorHTML(msg) {
+  return `<div class="error-box">
+    <p>AI 服务暂时不可用，请检查网络后重试</p>
+    ${msg ? `<p style="font-size:11px;color:var(--light);margin-bottom:8px">${esc(msg)}</p>` : ""}
+    <button class="retry-btn" onclick="doSearch(currentQuery)">重试</button>
+  </div>`;
+}
+
+// ═══════════════════════════════════════
+// 初始化渲染
+// ═══════════════════════════════════════
+(function init() {
+  document.getElementById("quick-list").innerHTML = QUICK_QUESTIONS.map(q =>
+    `<button class="quick-btn" onclick="doSearch('${esc(q)}')">${esc(q)}</button>`
+  ).join("");
+
+  document.getElementById("goal-grid").innerHTML = GOAL_ENTRIES.map(e => {
+    const c = e.color === "sage" ? "var(--sage)" : e.color === "terra" ? "var(--terra)" : "var(--text)";
+    return `<button class="goal-btn" onclick="showGoalPage('${esc(e.goalId)}')">
+      <div class="goal-label" style="color:${c}">${esc(e.label)}</div>
+      <div class="goal-desc">${esc(e.desc)}</div>
+    </button>`;
+  }).join("");
+
+  document.getElementById("topic-list").innerHTML = TOPICS.map(t =>
+    `<div class="topic-card" onclick="doSearch('${esc(t.label)}')">
+      <div class="topic-row">
+        <div>
+          <div class="topic-name">${esc(t.label)}</div>
+          <div class="topic-intro">${esc(t.intro)}</div>
+        </div>
+        <span style="font-size:18px;flex-shrink:0;margin-top:2px">→</span>
+      </div>
+      <div class="topic-tags">${t.tags.map(tag => `<span class="chip chip-sage">${esc(tag)}</span>`).join("")}</div>
+    </div>`
+  ).join("");
+})();
+</script>
+</body>
+</html>
